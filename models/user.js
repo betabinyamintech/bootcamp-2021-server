@@ -19,14 +19,16 @@ const userSchema = new mongoose.Schema(
 
     phone: Number,
 
-    city: String,
+    //  city: String,
+
+    address:String,
 
     isExpert: Boolean,
 
     expertDetails: {
       isVerified: Boolean,
       helpKind: String,
-      inquirySubjects: [String],
+      inquiryTags: [String],
       questionsBeforeMeeting: [String],
       lengthMeeting: Number,
       preferredMeetingType: { type: String, enum: ["physically", "virtual"] },
