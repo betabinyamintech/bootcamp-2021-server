@@ -30,15 +30,15 @@ const deleteAll = async () => await getRequest("/deleteall");
 
 const mockUser = { email: "123", password: "b" };
 
-test("/register", async () => {
-  const unregisterdedUser = mockUser;
-  const res = await registerUser(unregisterdedUser);
-  console.log("res.body", res.body);
-  const { token } = res.body;
-  expect(token).toBeDefined();
-});
+// test("/register", async () => {
+//   const unregisterdedUser = mockUser;
+//   const res = await registerUser(unregisterdedUser);
+//   console.log("res.body", res.body);
+//   const { token } = res.body;
+//   expect(token).toBeDefined();
+// });
 
-test("update profile", async () => {
-  const unregisterdedUser = { email: "a", password: "v" };
-  const user = await registerUser(unregisterdedUser);
-});
+// test("update profile", async () => {
+//   const unregisterdedUser = { email: "a", password: "v" };
+//   const user = await registerUser(unregisterdedUser);
+// });
