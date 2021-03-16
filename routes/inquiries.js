@@ -2,9 +2,9 @@ var express = require('express');
 var router = express.Router();
 
 /* GET users listing. */
-router.get('/', function(req, res, next) {
-  const  {idUser,title,explanation,inquirySubjects,status}= req.body
-  res.send(idUser,title,explanation,inquirySubjects,status);
+router.get('/:inquiryId', function(req, res, next) {
+  const  {inquiryId}= req.params;
+  res.send(inquiryId);
 
 });
 
@@ -17,18 +17,18 @@ router.post('/', function(req, res, next) {
 });
 
 //updata
-router.put('/inquiry/:idInquiry', function(req, res, next) {
+router.put('/:idInquiry', function(req, res, next) {
 
   const  {idUser,title,explanation,inquirySubjects,status}= req.body
 
-  await Product.updateOne({ idUser }, { idUser,title,explanation,inquirySubjects,status }).exec();
+  await Inquiry.updateOne({ idUser }, { idUser,title,explanation,inquirySubjects,status }).exec();
 
   res.send("OK!");
 
 });
 
 //delete data
-router.delete('/inquiry/:idInquiry', async function(req, res, next) {
+router.delete('/:idInquiry', async function(req, res, next) {
   const  {idUser}= req.params
   await Product.deleteOne({ idUser }).exec();
 
