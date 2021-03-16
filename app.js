@@ -6,7 +6,7 @@ const { authenticateToken, generateAccessToken } = require("./jwt");
 var logger = require("morgan");
 const {
   connectDb,
-  models: { User },
+  models: { User, Subject },
 } = require("./models");
 connectDb();
 
@@ -26,7 +26,23 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render("error");
 });
+app.get("/subject", authenticateToken, async (req, res) => {
+  const { name } = req.body;
+  const subject = await Subject.findOne({}).exec();
+  res.send(subject);
+});
+app.post("/subject", authenticateToken, async (req, res) => {
+  const { name } = req.body;
+  const subject = await new Subject({ name }).save();
+  console.log("POST!", subject);
+  res.send(subject);
+});
+app.delete("/subject", authenticateToken, async (req, res) => {
+  const { name } = req.body;
+  await subjec.deleteOne({ name }).exec();
 
+  res.send("OK!");
+});
 // app.post("/login", async (req, res) => {
 //   const { email, password} = req.body;
 //   const user = await User.findOne({ email,password }).exec();
@@ -40,18 +56,15 @@ app.use(function (err, req, res, next) {
 // });
 app.post("/register", async (req, res) => {
   try {
-    const {
-      email,
-      password,
-    } = req.body;
+    const { email, password } = req.body;
     const hash = bcrypt.hashSync(password, salt);
-    const token = generateAccessToken( {email });
+    const token = generateAccessToken({ email });
     console.log("token-------------------------:", token);
     const user = await new User({
       email,
-      password: hash, 
+      password: hash,
     }).save();
-    console.log('1234',user);
+    console.log("1234", user);
     const objectUser = user.toObject();
     objectUser.token = token;
     res.send(objectUser);
@@ -60,10 +73,9 @@ app.post("/register", async (req, res) => {
   }
 });
 
-app.post("/upDataProfile",authenticateToken, async (req, res) => {
+app.post("/upDataProfile", authenticateToken, async (req, res) => {
   try {
     const {
-     
       firstName,
       lastName,
       profession,
@@ -79,9 +91,8 @@ app.post("/upDataProfile",authenticateToken, async (req, res) => {
         meetingAddress,
       },
     } = req.body;
-  
+
     const user = await new User({
-    
       firstName,
       lastName,
       profession,
@@ -117,22 +128,21 @@ app.post("/login", async (req, res) => {
   objectUser.token = token;
   res.send(objectUser);
 });
-app.get('/hi', authenticateToken,(req,res)=>{
-  res.send('hello awsome team number 1!');
-})
+app.get("/hi", authenticateToken, (req, res) => {
+  res.send("hello awsome team number 1!");
+});
 app.use(function (req, res, next) {
   next(createError(404));
 });
 
 if (process.env.TEST) {
-  app.delete('/all', authenticateToken,(req,res)=>{
+  app.delete("/all", authenticateToken, (req, res) => {
     /// delete all data
     res.ok();
-  })
-  
+  });
 }
 
-if (!process.env.TEST) 
+if (!process.env.TEST)
   app.listen(process.env.PORT, () => {
     console.log("Opened port succesfully at port " + process.env.PORT);
   });
