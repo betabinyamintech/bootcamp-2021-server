@@ -8,7 +8,9 @@ const {
   connectDb,
   models: { User, Inquiry, Subject },
 } = require("./models");
-connectDb();
+connectDb().then(() => {
+  console.log("connected to dataBase!");
+});
 
 var app = express();
 const salt = 10;
@@ -58,8 +60,8 @@ app.post("/register", async (req, res) => {
   try {
     const { email, password } = req.body;
     const hash = bcrypt.hashSync(password, salt);
-    const existing = await (await User.findOne({ email: req.email })).exec();
-    if (!exisitng) {
+    const existing = await User.findOne({ email }).exec();
+    if (existing) {
       res.sendStatus(403);
       return;
     }
@@ -68,7 +70,7 @@ app.post("/register", async (req, res) => {
       email,
       password: hash,
     }).save();
-    const token = generateAccessToken(_id);
+    const token = generateAccessToken({ _id });
     res.send({ token });
   } catch (err) {
     res.send(err.message);
@@ -125,18 +127,15 @@ app.get("/inquiry", authenticateToken, async (req, res) => {
 app.get("/hi", authenticateToken, (req, res) => {
   res.send("hello awsome team number 1!");
 });
-app.use(function (req, res, next) {
-  next(createError(404));
-});
 
-if (process.env.TEST) {
-  app.get("/deleteall", (req, res) => {
+if (process.env.TEST || true) {
+  app.get("/deleteall", async (req, res) => {
     /// delete all data
-    User.deleteMany();
-    res.ok();
+    const response = await User.deleteMany();
+    console.log("response", response);
+    res.send("ok");
   });
 }
-
 if (!process.env.TEST)
   app.listen(process.env.PORT, () => {
     console.log("Opened port succesfully at port " + process.env.PORT);
