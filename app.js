@@ -43,10 +43,13 @@ app.post("/register", async (req, res) => {
     const { email, password } = req.body;
     const hash = bcrypt.hashSync(password, salt);
     const token = generateAccessToken({ email });
+
+    const existing = await User.findOne({ email: req.email }).exec();
+    if (existing == null) res.sendStatus(403);
     const user = await new User({
       email,
       password: hash,
-    }).save();
+  }).save();
     console.log("1234", user);
     const objectUser = user.toObject();
     objectUser.token = token;
