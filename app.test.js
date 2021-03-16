@@ -1,7 +1,6 @@
 const request = require("superagent");
 process.env.TEST = true;
-process.env.MONGO_USER_NAME_PASS =
-  "mongodb+srv://bootcamp032021:atlasBTech123@cluster0.nnxlj.mongodb.net/test";
+process.env.MONGO_USER_NAME_PASS = process.env.MONGO_TEST_SERVER
 const app = require("./app");
 const serverUrl = `http://localhost:${process.env.TESTPORT}`;
 
@@ -46,5 +45,5 @@ test("/register", async () => {
 
 test("update profile", async () => {
   const user = await loginUser(mockUser);
-  expect(user).toBeDefined();
+  expect(user).toBeD  efined();
 });
