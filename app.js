@@ -43,6 +43,27 @@ app.post("/register", async (req, res) => {
     const {
       email,
       password,
+    } = req.body;
+    const hash = bcrypt.hashSync(password, salt);
+    const token = generateAccessToken( {email });
+    console.log("token-------------------------:", token);
+    const user = await new User({
+      email,
+      password: hash, 
+    }).save();
+    console.log('1234',user);
+    const objectUser = user.toObject();
+    objectUser.token = token;
+    res.send(objectUser);
+  } catch (err) {
+    res.send(err.message);
+  }
+});
+
+app.post("/upDataProfile",authenticateToken, async (req, res) => {
+  try {
+    const {
+     
       firstName,
       lastName,
       profession,
@@ -58,12 +79,9 @@ app.post("/register", async (req, res) => {
         meetingAddress,
       },
     } = req.body;
-    const hash = bcrypt.hashSync(password, salt);
-    const token = generateAccessToken( {email });
-    console.log("token-------------------------:", token);
+  
     const user = await new User({
-      email,
-      password: hash,
+    
       firstName,
       lastName,
       profession,
@@ -105,8 +123,18 @@ app.get('/hi', authenticateToken,(req,res)=>{
 app.use(function (req, res, next) {
   next(createError(404));
 });
-app.listen(process.env.PORT, () => {
-  console.log("Opened port succesfully at port " + process.env.PORT);
-});
+
+if (process.env.TEST) {
+  app.delete('/all', authenticateToken,(req,res)=>{
+    /// delete all data
+    res.ok();
+  })
+  
+}
+
+if (!process.env.TEST) 
+  app.listen(process.env.PORT, () => {
+    console.log("Opened port succesfully at port " + process.env.PORT);
+  });
 
 module.exports = app;
