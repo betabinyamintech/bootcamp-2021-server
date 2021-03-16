@@ -1,3 +1,3 @@
-const subjectRouter = require("./subjects");
+const inquiriesRouter = require("./inquiries");
 
-module.exports = { subjectRouter };
+module.exports = { inquiriesRouter };

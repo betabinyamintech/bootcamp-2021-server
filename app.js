@@ -12,7 +12,7 @@ connectDb().then(() => {
   console.log("connected to dataBase!");
 });
 const app = express();
-const { subjectRouter } = require("./routes");
+const { inquiriesRouter } = require("./routes");
 const salt = 10;
 
 app.use(logger("dev"));
@@ -77,7 +77,7 @@ app.post("/login", async (req, res) => {
   const { _id } = await User.findOne({ email }).exec();
   const token = generateAccessToken({ _id });
 
-  const isValid = bcrypt.compareSync(password, user.password);
+  const isValid = bcrypt.compareSync(password, _id.password);
   if (!isValid) throw Error("user not valid");
   const objectUser = user.toObject();
   objectUser.token = token;
@@ -119,7 +119,7 @@ if (process.env.TEST || true) {
     res.send("ok");
   });
 }
-app.use("/subject", subjectRouter);
+app.use("/inquiries", inquiriesRouter);
 if (!process.env.TEST)
   app.listen(process.env.PORT, () => {
     console.log("Opened port succesfully at port " + process.env.PORT);
