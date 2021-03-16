@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const User = require("./user");
-const Inquiry = require("./ןnquiry");
+const Inquiry = require("./inquiry");
 
 const connectDb = async () => {
   const mongoUrl = process.env.MONGO_USER_NAME_PASS;

@@ -45,13 +45,13 @@ app.post("/register", async (req, res) => {
       password,
     } = req.body;
     const hash = bcrypt.hashSync(password, salt);
-    const token = generateAccessToken( {email });
-    console.log("token-------------------------:", token);
-    const user = await new User({
+    const {_id} = await new User({
       email,
       password: hash, 
     }).save();
-    console.log('1234',user);
+    const token = generateAccessToken( _id);
+    console.log("token-------------------------:", token);
+    console.log('user register:',user);
     const objectUser = user.toObject();
     objectUser.token = token;
     res.send(objectUser);
@@ -60,10 +60,9 @@ app.post("/register", async (req, res) => {
   }
 });
 
-app.post("/upDataProfile",authenticateToken, async (req, res) => {
+app.post("/setProfile",authenticateToken, async (req, res) => {
   try {
-    const {
-     
+    const {   
       firstName,
       lastName,
       profession,
@@ -71,6 +70,7 @@ app.post("/upDataProfile",authenticateToken, async (req, res) => {
       city,
       isExpert,
       expertDetails: {
+        isVerified,
         helpKind,
         inquirySubjects,
         questionsBeforeMeeting,
@@ -80,8 +80,7 @@ app.post("/upDataProfile",authenticateToken, async (req, res) => {
       },
     } = req.body;
   
-    const user = await new User({
-    
+    const user = await new User({   
       firstName,
       lastName,
       profession,
@@ -89,6 +88,7 @@ app.post("/upDataProfile",authenticateToken, async (req, res) => {
       city,
       isExpert,
       expertDetails: {
+        isVerified,
         helpKind,
         inquirySubjects,
         questionsBeforeMeeting,
@@ -108,8 +108,8 @@ app.post("/upDataProfile",authenticateToken, async (req, res) => {
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  const user = await User.findOne({ email }).exec();
-  const token = generateAccessToken({ email });
+  const {_id} = await User.findOne({ email }).exec();
+  const token = generateAccessToken({ _id });
 
   const isValid = bcrypt.compareSync(password, user.password);
   if (!isValid) throw Error("user not valid");
@@ -149,10 +149,13 @@ if (process.env.TEST) {
   })
   
 }
-
-if (!process.env.TEST) 
-  app.listen(process.env.PORT, () => {
-    console.log("Opened port succesfully at port " + process.env.PORT);
+// if (!process.env.TEST) 
+  app.listen(5000, () => {
+    console.log("Opened port succesfully at port 5000");
   });
+// if (!process.env.TEST) 
+//   app.listen(process.env.PORT, () => {
+//     console.log("Opened port succesfully at port " + process.env.PORT);
+//   });
 
 module.exports = app;

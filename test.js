@@ -1,6 +1,6 @@
 const request = require('superagent')
 
-const serverUrl = 'http://localhost:5000'
+const serverUrl = 'http://localhost:'+process.env.TESTPORT;
 
 request.post(serverUrl + '/login')
         .set('Accept', 'application/json')
