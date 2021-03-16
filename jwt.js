@@ -5,7 +5,7 @@ function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
   if (token == null) return res.sendStatus(401); // if there isn't any token
-  console.log("token auto:" + token);
+  console.log("token:" + token);
   jwt.verify(token, process.env.TOKEN_SECRET, (err, user) => {
     console.log("user: ", user);
     console.log(err);
@@ -17,7 +17,6 @@ function authenticateToken(req, res, next) {
 
 function generateAccessToken(user) {
   // expires after half and hour (1800 seconds = 30 minutes)
-  console.log("user jwt:" + user.email);
   return jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: "30000s" });
 }
 

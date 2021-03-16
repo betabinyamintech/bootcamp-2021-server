@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const User = require("./user");
+const Inquiry = require("./inquiry");
 const Subject = require("./subject");
 
 const connectDb = async () => {
@@ -11,6 +12,6 @@ const connectDb = async () => {
     useUnifiedTopology: true,
   });
 };
-const models = { User, Subject };
+const models = { User, Inquiry, Subject };
 
 module.exports = { connectDb, models };
