@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const User = require("./user");
+const Inquiry = require("./ןnquiry");
 
 const connectDb = async () => {
   const mongoUrl = process.env.MONGO_USER_NAME_PASS;
@@ -10,6 +11,6 @@ const connectDb = async () => {
     useUnifiedTopology: true,
   });
 };
-const models = { User };
+const models = { User,Inquiry };
 
 module.exports = { connectDb, models };

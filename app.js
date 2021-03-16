@@ -6,7 +6,7 @@ const { authenticateToken, generateAccessToken } = require("./jwt");
 var logger = require("morgan");
 const {
   connectDb,
-  models: { User },
+  models: { User,Inquiry },
 } = require("./models");
 connectDb();
 
@@ -99,6 +99,24 @@ app.post("/login", async (req, res) => {
   objectUser.token = token;
   res.send(objectUser);
 });
+
+app.post("/inquiry",authenticateToken, async (req, res) => {
+  const { idUser, title,explanation,inquirySubjects,status } = req.body;
+  const inquiry = await new Inquiry({ idUser, title,explanation,inquirySubjects,status }).save();
+  res.send(inquiry);
+});
+
+app.get("/inquiry",authenticateToken, async (req, res) => {
+  const { _id} = req.body;
+  const inquiry = await Inquiry.findOne({_id}).exec();
+  res.send(inquiry??{});
+});
+app.get("/inquiry",authenticateToken, async (req, res) => {
+  const { idUser} = req.body;
+  const inquiries = await Inquiry.find({idUser}).exec();
+  res.send(inquiries??{});
+});
+
 app.get('/hi', authenticateToken,(req,res)=>{
   res.send('hello awsome team number 1!');
 })
