@@ -45,5 +45,5 @@ test("/register", async () => {
 
 test("update profile", async () => {
   const user = await loginUser(mockUser);
-  expect(user).toBeD  efined();
+  expect(user).toBeDefined();
 });
