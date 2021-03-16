@@ -109,7 +109,8 @@ app.get("/inquiry", authenticateToken, async (req, res) => {
 });
 
 app.get("/hi", authenticateToken, (req, res) => {
-  res.send("hello awsome team number 1!");
+  const {_id}=req.user;
+  res.send("hello id: "+_id);
 });
 
 if (process.env.TEST || true) {

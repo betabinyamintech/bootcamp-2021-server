@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-const tagRouter = require("./tags");
-
-module.exports = { tagRouter };
-=======
+const tagRouter = require("./tag");
 const inquiriesRouter = require("./inquiries");
 
-module.exports = { inquiriesRouter };
->>>>>>> 5fd8170424583fc4f4de5949396eb4bb8527d026
+module.exports = { inquiriesRouter ,tagRouter};

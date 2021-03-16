@@ -6,7 +6,7 @@ const Tag = require("./tag");
 
 const connectDb = async () => {
   const mongoUrl = process.env.MONGO_USER_NAME_PASS;
-  console.log("Connecting to mongo server: " + mongoUrl);
+  console.log("Connecting to mongo server in index: " + mongoUrl);
   return await mongoose.connect(mongoUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,

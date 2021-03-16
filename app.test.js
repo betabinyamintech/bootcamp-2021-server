@@ -1,6 +1,6 @@
 const request = require("superagent");
 process.env.TEST = true;
-process.env.MONGO_USER_NAME_PASS = process.env.MONGO_TEST_SERVER
+// process.env.MONGO_USER_NAME_PASS = process.env.MONGO_TEST_SERVER
 const app = require("./app");
 const serverUrl = `http://localhost:${process.env.TESTPORT}`;
 
@@ -34,13 +34,18 @@ const loginUser = async ({ email, password }) =>
 const deleteAll = async () => await getRequest("/deleteall");
 
 const mockUser = { email: "123", password: "b" };
-
+let my_token;
 
 test("/register", async () => {
   const unregisterdedUser = mockUser;
   const res = await registerUser(unregisterdedUser);
   const { token } = res.body;
+  my_token=token;
   expect(token).toBeDefined();
+});
+test("/hi", async () => {
+  const res=await getRequestWithToken("/hi",my_token);
+  console.log(res.text);
 });
 
 test("update profile", async () => {
