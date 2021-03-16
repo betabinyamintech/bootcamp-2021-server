@@ -59,7 +59,6 @@ app.post("/register", async (req, res) => {
     const { email, password } = req.body;
     const hash = bcrypt.hashSync(password, salt);
     const token = generateAccessToken({ email });
-    console.log("token-------------------------:", token);
     const user = await new User({
       email,
       password: hash,
@@ -136,8 +135,9 @@ app.use(function (req, res, next) {
 });
 
 if (process.env.TEST) {
-  app.delete("/all", authenticateToken, (req, res) => {
+  app.get("/deleteall", (req, res) => {
     /// delete all data
+    User.deleteMany();
     res.ok();
   });
 }
