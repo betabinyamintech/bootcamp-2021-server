@@ -74,14 +74,14 @@ app.post("/setProfile", authenticateToken, async (req, res) => {
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  const { _id } = await User.findOne({ email }).exec();
-  const token = generateAccessToken({ _id });
-
+  const user = await User.findOne({ email }).exec();
+  const {_id}=user;
+  
   const isValid = bcrypt.compareSync(password, user.password);
-  if (!isValid) throw Error("user not valid");
-  const objectUser = user.toObject();
-  objectUser.token = token;
-  res.send(objectUser);
+  if (!isValid) throw Error("password not valid");
+
+  const token = generateAccessToken({ _id });
+  res.send({token});
 });
 
 app.post("/inquiry", authenticateToken, async (req, res) => {
