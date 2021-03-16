@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema(
     expertDetails: {
       isVerified: Boolean,
       helpKind: String,
-      inquirySubjects: [String],
+      inquiryTags: [String],
       questionsBeforeMeeting: [String],
       lengthMeeting: Number,
       preferredMeetingType: { type: String, enum: ["physically", "virtual"] },

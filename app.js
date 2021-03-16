@@ -6,13 +6,13 @@ const { authenticateToken, generateAccessToken } = require("./jwt");
 const logger = require("morgan");
 const {
   connectDb,
-  models: { User, Inquiry, Subject },
+  models: { User, Inquiry, Tag },
 } = require("./models");
 connectDb().then(() => {
   console.log("connected to dataBase!");
 });
 const app = express();
-const { subjectRouter } = require("./routes");
+const { tagRouter } = require("./routes");
 const salt = 10;
 
 app.use(logger("dev"));
@@ -85,12 +85,12 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/inquiry", authenticateToken, async (req, res) => {
-  const { idUser, title, explanation, inquirySubjects, status } = req.body;
+  const { idUser, title, explanation, inquiryTags, status } = req.body;
   const inquiry = await new Inquiry({
     idUser,
     title,
     explanation,
-    inquirySubjects,
+    inquiryTags,
     status,
   }).save();
   res.send(inquiry);
@@ -119,7 +119,7 @@ if (process.env.TEST || true) {
     res.send("ok");
   });
 }
-app.use("/subject", subjectRouter);
+app.use("/tag", tagRouter);
 if (!process.env.TEST)
   app.listen(process.env.PORT, () => {
     console.log("Opened port succesfully at port " + process.env.PORT);

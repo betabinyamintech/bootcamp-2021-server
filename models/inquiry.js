@@ -3,10 +3,10 @@ const mongoose = require("mongoose");
 
 const inquirySchema = new mongoose.Schema(
   {
-    idUser: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: "User", 
-      required: true
+    idUser: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
     title: {
       type: String,
@@ -16,7 +16,7 @@ const inquirySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    inquirySubjects: { type: [String], required: true },
+    inquiryTags: { type: [String], required: true },
 
     status: {
       type: String,
