@@ -1,9 +1,9 @@
 require("dotenv").config();
-var createError = require("http-errors");
-var express = require("express");
+const createError = require("http-errors");
+const express = require("express");
 const bcrypt = require("bcrypt");
 const { authenticateToken, generateAccessToken } = require("./jwt");
-var logger = require("morgan");
+const logger = require("morgan");
 const {
   connectDb,
   models: { User, Inquiry, Subject },
@@ -11,8 +11,8 @@ const {
 connectDb().then(() => {
   console.log("connected to dataBase!");
 });
-
-var app = express();
+const app = express();
+const { subjectRouter } = require("./routes");
 const salt = 10;
 
 app.use(logger("dev"));
@@ -27,23 +27,6 @@ app.use(function (err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render("error");
-});
-app.get("/subject", authenticateToken, async (req, res) => {
-  const { name } = req.body;
-  const subject = await Subject.findOne({}).exec();
-  res.send(subject);
-});
-app.post("/subject", authenticateToken, async (req, res) => {
-  const { name } = req.body;
-  const subject = await new Subject({ name }).save();
-  console.log("POST!", subject);
-  res.send(subject);
-});
-app.delete("/subject", authenticateToken, async (req, res) => {
-  const { name } = req.body;
-  await subjec.deleteOne({ name }).exec();
-
-  res.send("OK!");
 });
 // app.post("/login", async (req, res) => {
 //   const { email, password} = req.body;
@@ -136,6 +119,7 @@ if (process.env.TEST || true) {
     res.send("ok");
   });
 }
+app.use("/subject", subjectRouter);
 if (!process.env.TEST)
   app.listen(process.env.PORT, () => {
     console.log("Opened port succesfully at port " + process.env.PORT);
