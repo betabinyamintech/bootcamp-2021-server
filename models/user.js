@@ -11,31 +11,20 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    firstName: {
-      type: String,
-      required: true,
-    },
-    lastName: {
-      type: String,
-      required: true,
-    },
-    profession: {
-      type: String,
-      required: true,
-    },
-    phone: {
-      type: Number,
-      required: true,
-    },
-    city: {
-      type: String,
-      required: true,
-    },
-    isExpert: {
-      type: Boolean,
-      required: true,
-    },
+    firstName: String,
+
+    lastName: String,
+
+    profession: String,
+
+    phone: Number,
+
+    city: String,
+
+    isExpert: Boolean,
+
     expertDetails: {
+      isVerified: Boolean,
       helpKind: String,
       inquirySubjects: [String],
       questionsBeforeMeeting: [String],
