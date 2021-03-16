@@ -19,7 +19,9 @@ const userSchema = new mongoose.Schema(
 
     phone: Number,
 
-    city: String,
+    //  city: String,
+
+    address:String,
 
     isExpert: Boolean,
 
