@@ -6,7 +6,7 @@ const { authenticateToken, generateAccessToken } = require("./jwt");
 var logger = require("morgan");
 const {
   connectDb,
-  models: { User },
+  models: { User, Subject },
 } = require("./models");
 connectDb();
 
@@ -26,7 +26,23 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render("error");
 });
+app.get("/subject", authenticateToken, async (req, res) => {
+  const { name } = req.body;
+  const subject = await Subject.findOne({}).exec();
+  res.send(subject);
+});
+app.post("/subject", authenticateToken, async (req, res) => {
+  const { name } = req.body;
+  const subject = await new Subject({ name }).save();
+  console.log("POST!", subject);
+  res.send(subject);
+});
+app.delete("/subject", authenticateToken, async (req, res) => {
+  const { name } = req.body;
+  await subjec.deleteOne({ name }).exec();
 
+  res.send("OK!");
+});
 // app.post("/login", async (req, res) => {
 //   const { email, password} = req.body;
 //   const user = await User.findOne({ email,password }).exec();
