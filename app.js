@@ -6,7 +6,7 @@ const { authenticateToken, generateAccessToken } = require("./jwt");
 var logger = require("morgan");
 const {
   connectDb,
-  models: { User,Inquiry },
+  models: { User, Inquiry, Subject },
 } = require("./models");
 connectDb();
 
@@ -26,7 +26,23 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render("error");
 });
+app.get("/subject", authenticateToken, async (req, res) => {
+  const { name } = req.body;
+  const subject = await Subject.findOne({}).exec();
+  res.send(subject);
+});
+app.post("/subject", authenticateToken, async (req, res) => {
+  const { name } = req.body;
+  const subject = await new Subject({ name }).save();
+  console.log("POST!", subject);
+  res.send(subject);
+});
+app.delete("/subject", authenticateToken, async (req, res) => {
+  const { name } = req.body;
+  await subjec.deleteOne({ name }).exec();
 
+  res.send("OK!");
+});
 // app.post("/login", async (req, res) => {
 //   const { email, password} = req.body;
 //   const user = await User.findOne({ email,password }).exec();
@@ -40,63 +56,28 @@ app.use(function (err, req, res, next) {
 // });
 app.post("/register", async (req, res) => {
   try {
-    const {
-      email,
-      password,
-    } = req.body;
+    const { email, password } = req.body;
     const hash = bcrypt.hashSync(password, salt);
-    const {_id} = await new User({
+    const existing = await (await User.findOne({ email: req.email })).exec();
+    if (!exisitng) {
+      res.sendStatus(403);
+      return;
+    }
+
+    const { _id } = await new User({
       email,
-      password: hash, 
+      password: hash,
     }).save();
-    const token = generateAccessToken( _id);
-    console.log("token-------------------------:", token);
-    console.log('user register:',user);
-    const objectUser = user.toObject();
-    objectUser.token = token;
-    res.send(objectUser);
+    const token = generateAccessToken(_id);
+    res.send({ token });
   } catch (err) {
     res.send(err.message);
   }
 });
 
-app.post("/setProfile",authenticateToken, async (req, res) => {
+app.post("/setProfile", authenticateToken, async (req, res) => {
   try {
-    const {   
-      firstName,
-      lastName,
-      profession,
-      phone,
-      city,
-      isExpert,
-      expertDetails: {
-        isVerified,
-        helpKind,
-        inquirySubjects,
-        questionsBeforeMeeting,
-        lengthMeeting,
-        preferredMeetingType,
-        meetingAddress,
-      },
-    } = req.body;
-  
-    const user = await new User({   
-      firstName,
-      lastName,
-      profession,
-      phone,
-      city,
-      isExpert,
-      expertDetails: {
-        isVerified,
-        helpKind,
-        inquirySubjects,
-        questionsBeforeMeeting,
-        lengthMeeting,
-        preferredMeetingType,
-        meetingAddress,
-      },
-    }).save();
+    const user = await new User(req.body).save();
     console.log(user);
     const objectUser = user.toObject();
     objectUser.token = token;
@@ -108,7 +89,7 @@ app.post("/setProfile",authenticateToken, async (req, res) => {
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  const {_id} = await User.findOne({ email }).exec();
+  const { _id } = await User.findOne({ email }).exec();
   const token = generateAccessToken({ _id });
 
   const isValid = bcrypt.compareSync(password, user.password);
@@ -118,44 +99,47 @@ app.post("/login", async (req, res) => {
   res.send(objectUser);
 });
 
-app.post("/inquiry",authenticateToken, async (req, res) => {
-  const { idUser, title,explanation,inquirySubjects,status } = req.body;
-  const inquiry = await new Inquiry({ idUser, title,explanation,inquirySubjects,status }).save();
+app.post("/inquiry", authenticateToken, async (req, res) => {
+  const { idUser, title, explanation, inquirySubjects, status } = req.body;
+  const inquiry = await new Inquiry({
+    idUser,
+    title,
+    explanation,
+    inquirySubjects,
+    status,
+  }).save();
   res.send(inquiry);
 });
 
-app.get("/inquiry",authenticateToken, async (req, res) => {
-  const { _id} = req.body;
-  const inquiry = await Inquiry.findOne({_id}).exec();
-  res.send(inquiry??{});
+app.get("/inquiry", authenticateToken, async (req, res) => {
+  const { _id } = req.body;
+  const inquiry = await Inquiry.findOne({ _id }).exec();
+  res.send(inquiry ?? {});
 });
-app.get("/inquiry",authenticateToken, async (req, res) => {
-  const { idUser} = req.body;
-  const inquiries = await Inquiry.find({idUser}).exec();
-  res.send(inquiries??{});
+app.get("/inquiry", authenticateToken, async (req, res) => {
+  const { idUser } = req.body;
+  const inquiries = await Inquiry.find({ idUser }).exec();
+  res.send(inquiries ?? {});
 });
 
-app.get('/hi', authenticateToken,(req,res)=>{
-  res.send('hello awsome team number 1!');
-})
+app.get("/hi", authenticateToken, (req, res) => {
+  res.send("hello awsome team number 1!");
+});
 app.use(function (req, res, next) {
   next(createError(404));
 });
 
 if (process.env.TEST) {
-  app.delete('/all', authenticateToken,(req,res)=>{
+  app.get("/deleteall", (req, res) => {
     /// delete all data
+    User.deleteMany();
     res.ok();
-  })
-  
-}
-// if (!process.env.TEST) 
-  app.listen(5000, () => {
-    console.log("Opened port succesfully at port 5000");
   });
-// if (!process.env.TEST) 
-//   app.listen(process.env.PORT, () => {
-//     console.log("Opened port succesfully at port " + process.env.PORT);
-//   });
+}
+
+if (!process.env.TEST)
+  app.listen(process.env.PORT, () => {
+    console.log("Opened port succesfully at port " + process.env.PORT);
+  });
 
 module.exports = app;

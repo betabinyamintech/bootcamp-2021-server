@@ -17,7 +17,6 @@ function authenticateToken(req, res, next) {
 
 function generateAccessToken(user) {
   // expires after half and hour (1800 seconds = 30 minutes)
-  console.log("user jwt:" + user._id);
   return jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: "30000s" });
 }
 
