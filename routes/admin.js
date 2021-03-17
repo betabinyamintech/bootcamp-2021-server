@@ -14,28 +14,31 @@ router.use((req, res, next) => {
 });
 
 router.get("/experts", authenticateToken, async (req, res) => {
-  const users = await User.find({}).exec();
-  const experts = users
-    .filter((user) => user.isExpert)
-    .map(
-      ({
-        _id,
-        firstName,
-        lastName,
-        helpKind,
-        city,
-        profession,
-        inquiryTags,
-      }) => {
-        _id, firstName, lastName, helpKind, city, profession, inquiryTags;
-      }
+  const { name, tag } = req.query;
+  
+  const experts = await User.find(
+    { isExpert: true },
+    {
+      _id: 1,
+      firstName: 1,
+      lastName: 1,
+      helpKind: 1,
+      city: 1,
+      profession: 1,
+      inquiryTags: 1,
+    }
+  )
+    .exec()
+    .filter(
+      ({ firstName, lastName, inquiryTags }) =>
+        (!name||firstName.includes(name) || lastName.includes(name)) &&
+        (!tag||inquiryTags.includes(tag))
     );
   res.send(experts ?? {});
 });
 
 router.get("/inquiries", authenticateToken, async (req, res) => {
-  const { q } = req.query;
-  const inquiries = await Inquiry.find({}).exec();
+  const inquiries = await Inquiry.find(req.query).exec();
   res.send(inquiries ?? {});
 });
 

@@ -71,7 +71,7 @@ app.post("/login", async (req, res) => {
   }
 
   const token = generateAccessToken(user);
-  res.send({ token });
+  res.send({ user,token });
 });
 
 app.use("/users", usersRouter);
