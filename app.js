@@ -1,6 +1,7 @@
 const createError = require("http-errors");
 const express = require("express");
 const bcrypt = require("bcrypt");
+const cors = require("cors");
 const { authenticateToken, generateAccessToken } = require("./jwt");
 const logger = require("morgan");
 
@@ -13,6 +14,7 @@ const app = express();
 const { usersRouter, tagsRouter, inquiriesRouter } = require("./routes");
 const salt = 10;
 
+app.use(cors());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

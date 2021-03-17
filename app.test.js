@@ -42,9 +42,16 @@ describe("auth", () => {
     });
     expect(res.body).toBeDefined();
   });
+  test("without token", async () => {
+      const res = await putRequestWithToken("/users/", "123").send({
+        firstName: "reut",
+        isExpert: true,
+      });
+
+    expect(res.text).toBe("invalid token");
+  });
   test("get experts", async () => {
     const res = await getRequestWithToken("/users/experts", my_token);
-    console.log(res.body);
     expect(res.body[0].isExpert).toBe(true);
   });
   test("get user", async () => {
