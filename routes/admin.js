@@ -17,9 +17,19 @@ router.get("/experts", authenticateToken, async (req, res) => {
   const users = await User.find({}).exec();
   const experts = users
     .filter((user) => user.isExpert)
-    .map(({ _id, firstName, lastName, helpKind, city, profession, inquiryTags }) => {
-      _id, firstName, lastName, helpKind, city, profession, inquiryTags;
-    });
+    .map(
+      ({
+        _id,
+        firstName,
+        lastName,
+        helpKind,
+        city,
+        profession,
+        inquiryTags,
+      }) => {
+        _id, firstName, lastName, helpKind, city, profession, inquiryTags;
+      }
+    );
   res.send(experts ?? {});
 });
 
