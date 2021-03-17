@@ -62,8 +62,12 @@ app.post("/register", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
+  console.log(req.body);
   const user = await User.findOne({ email }).exec();
-
+  if (!user) {
+    res.status(403).send("user not exist");
+    return;
+  }
   const isValid = bcrypt.compareSync(password, user.password);
   if (!isValid) {
     res.status(403).send("invalid password");
@@ -71,7 +75,7 @@ app.post("/login", async (req, res) => {
   }
 
   const token = generateAccessToken(user);
-  res.send({ user,token });
+  res.send({ user, token });
 });
 
 app.use("/users", usersRouter);
