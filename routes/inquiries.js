@@ -8,22 +8,13 @@ const {
 /* GET specific inquiry. */
 router.get("/:inquiryId", authenticateToken, async (req, res) => {
   const { inquiryId } = req.params;
-  const inquiry = await Inquiry.findOne({ _id: inquiryId });
+  
+  const inquiry =await Inquiry.findOne({ _id: inquiryId }).populate('userId').populate('expertsFound').populate('movedToExpert.expertId').exec(); 
   console.log(inquiry);
   res.send(inquiry);
 });
 
 /* GET inquiries by user id. */
-router.get("/:userId", authenticateToken, async (req, res) => {
-  const { userId } = req.params;
-  const inquiries = await Inquiry.find({ userId }).exec();
-  const clientInquiries = inquiries.map(
-    ({ inquiryTitle, status, createdAT }) => {
-      inquiryTitle, status, createdAT;
-    }
-  );
-  res.send(clientInquiries ?? {});
-});
 router.get("/user", authenticateToken, async (req, res) => {
   const userId = req.user._id;
   const inquiries = await Inquiry.find({ userId }).exec();
@@ -43,7 +34,8 @@ router.get("/", authenticateToken, async (req, res) => {
 
 //creat data
 router.post("/", authenticateToken, async (req, res) => {
-  const inquiry = await new Inquiry(req.body).save();
+  const userId = req.user._id;
+  const inquiry = await new Inquiry({userId,...req.body}).save();
   console.log("POST! creat inquiry ", inquiry);
   res.send(inquiry);
 });

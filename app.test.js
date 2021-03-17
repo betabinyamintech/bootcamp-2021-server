@@ -61,4 +61,10 @@ describe("auth", () => {
     const res = await getRequestWithToken("/users/experts", my_token);
     expect(res.body[0].isExpert).toBe(true);
   });
+  test("post inquiry"), async()=>{
+    
+  }
+  test("get inquiry",async()=>{
+    const res=await getRequestWithToken("/inquiries/")
+  })
 });
