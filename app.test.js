@@ -66,4 +66,10 @@ describe("auth", () => {
     // expect(res.body[0].isExpert).toBe(true);
     //expect(res.body).toBeDefined();
   });
+  test("post inquiry"), async()=>{
+    
+  }
+  test("get inquiry",async()=>{
+    const res=await getRequestWithToken("/inquiries/")
+  })
 });
