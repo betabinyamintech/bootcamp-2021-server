@@ -9,7 +9,7 @@ function authenticateToken(req, res, next) {
   jwt.verify(token, process.env.TOKEN_SECRET, (err, user) => {
     console.log("user: ", user);
     console.log(err);
-    if (err) return res.sendStatus(403);
+    if (err) return res.status(403).send("invalid token");
     req.user = user;
     next(); // pass the execution off to whatever request the client intended
   });
