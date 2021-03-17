@@ -1,9 +1,15 @@
-  var express = require('express');
-  var router = express.Router();
+var express = require("express");
+var router = express.Router();
 
-  /* GET users listing. */
-  router.get('/', function(req, res, next) {
-    res.send('respond with a resource');
-  });
+const {
+  models: { User },
+} = require("../models");
 
-  module.exports = router;
+/* GET users listing. */
+router.get("/", authenticateToken, async (req, res) => {
+  const users = await User.find({}).exec();
+  const experts = users.filter((user) => user.isExpert);
+  res.send(experts ?? {});
+});
+
+module.exports = router;
