@@ -11,6 +11,8 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    profileFullFields: String,
+    imageSrc: String,
     firstName: String,
     lastName: String,
     profession: String,
