@@ -8,7 +8,7 @@ require("dotenv").config();
 console.log("env", process.env);
 
 const {
-  models: { User, Inquiry },
+  models: { User },
 } = require("./models");
 const app = express();
 const { usersRouter, tagsRouter, inquiriesRouter } = require("./routes");
@@ -35,17 +35,17 @@ function validateEmail(email) {
 app.post("/register", async (req, res) => {
   try {
     const { email, password } = req.body;
-    if (!validateEmail) {
-      res.status(403).send("invalid email");
+    if (!validateEmail(email)) {
+      res.status(403).send("invalid email").end();
       return;
     }
 
     const existing = await User.findOne({ email }).exec();
     if (existing) {
-      res.status(403).send("email already existing");
+      res.status(403).send("email already existing").end();
       return;
     }
-    
+
     const hash = bcrypt.hashSync(password, salt);
     const user = await new User({
       email,
@@ -61,10 +61,13 @@ app.post("/register", async (req, res) => {
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email }).exec();
-  console.log("/login get user for email: ", email, user);
 
   const isValid = bcrypt.compareSync(password, user.password);
-  if (!isValid) throw Error("user not valid");
+  if (!isValid) {
+    res.status(403).send("invalid password");
+    return;
+  }
+
   const token = generateAccessToken(user);
   res.send({ token });
 });
