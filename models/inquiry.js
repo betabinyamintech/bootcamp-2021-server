@@ -16,7 +16,7 @@ const inquirySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    inquiryTags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tag" }],
+    inquiryTags: [String],
 
     status: {
       type: String,
@@ -27,8 +27,8 @@ const inquirySchema = new mongoose.Schema(
         "movedToExpert",
         "responseFromExpert",
         "meetingScheduled",
-        "meetingWas",      
-        "irrelevant"
+        "meetingWas",
+        "irrelevant",
       ],
     },
     irrelevantDetails: {
@@ -42,13 +42,19 @@ const inquirySchema = new mongoose.Schema(
         ref: "User",
       },
     ],
-    answersToExpertQuestions: [{ question: String, ans: String }],
+    movedToExpert: {
+      expertId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      answersToExpertQuestions: [{ question: String, ans: String }],
+    },
     meetingOptions: {
       optionalDates: [Date],
       lengthMeeting: Number,
       preferredMeetingType: { type: String, enum: ["physically", "virtual"] },
       meetingAddress: String,
-      scheduledDate:Date,
+      scheduledDate: Date,
     },
   },
   { timestamps: true }

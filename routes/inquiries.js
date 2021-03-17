@@ -37,5 +37,26 @@ router.delete('/:idInquiry', async function(req, res, next) {
   res.send("OK!");
 
 });
+// app.post("/inquiry", authenticateToken, async (req, res) => {
+//   const { idUser, title, explanation, inquiryTags, status } = req.body;
+//   const inquiry = await new Inquiry({
+//     idUser,
+//     title,
+//     explanation,
+//     inquiryTags,
+//     status,
+//   }).save();
+//   res.send(inquiry);
+// });
 
+// app.get("/inquiry", authenticateToken, async (req, res) => {
+//   const { _id } = req.body;
+//   const inquiry = await Inquiry.findOne({ _id }).exec();
+//   res.send(inquiry ?? {});
+// });
+// app.get("/inquiry", authenticateToken, async (req, res) => {
+//   const { idUser } = req.body;
+//   const inquiries = await Inquiry.find({ idUser }).exec();
+//   res.send(inquiries ?? {});
+// });
 module.exports = router;

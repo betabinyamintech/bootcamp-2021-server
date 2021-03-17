@@ -12,18 +12,12 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     firstName: String,
-
     lastName: String,
-
     profession: String,
-
     phone: Number,
-
-    //  city: String,
-
-    address:String,
-
+    city: String,
     isExpert: Boolean,
+    isAdmin: Boolean,
 
     expertDetails: {
       isVerified: Boolean,

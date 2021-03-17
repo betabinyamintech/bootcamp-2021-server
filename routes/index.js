@@ -1,4 +1,5 @@
-const tagRouter = require("./tag");
+const tagsRouter = require("./tags");
 const inquiriesRouter = require("./inquiries");
+const usersRouter = require("./users");
 
-module.exports = { inquiriesRouter ,tagRouter};
+module.exports = {usersRouter, inquiriesRouter ,tagRouter};
