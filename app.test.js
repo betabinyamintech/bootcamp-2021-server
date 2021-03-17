@@ -1,5 +1,6 @@
 const request = require("supertest");
 const app = require("./app");
+const User = require("./models/user");
 
 const getRequest = (location) => request(app).get(location);
 const postRequest = (location) => request(app).post(location).set("Accept", "application/json");
@@ -36,28 +37,33 @@ describe("auth", () => {
     expect(res.body.token).toBeDefined();
   });
   test("update user", async () => {
-    const res = await putRequestWithToken("/users/", my_token).send({
+    const res = await putRequestWithToken("/users", my_token).send({
       firstName: "reut",
       isExpert: true,
     });
     expect(res.body).toBeDefined();
   });
   test("without token", async () => {
-      const res = await putRequestWithToken("/users/", "123").send({
-        firstName: "reut",
-        isExpert: true,
-      });
+    const res = await putRequestWithToken("/users", "123").send({
+      firstName: "reut",
+      isExpert: true,
+    });
 
     expect(res.text).toBe("invalid token");
   });
-  test("get experts", async () => {
-    const res = await getRequestWithToken("/users/experts", my_token);
-    expect(res.body[0].isExpert).toBe(true);
-  });
-  test("get user", async () => {
-    const res = await getRequestWithToken("/users/:userId", my_token);
-    console.log(res.body);
+  // test("get experts", async () => {
+  //   const res = await getRequestWithToken("/users/experts", my_token);
+  //   expect(res.body[0].isExpert).toBe(true);
+  // });
+
+  test("get user for admin", async () => {
+    const adminEmail = "stam@email.com";
+    const registerResponse = await registerUser(adminEmail, "123");
+    console.log("register response", registerResponse);
+    await User.updateOne({ email: adminEmail }, { isAdmin: true }).exec();
+    const res = getRequestWithToken("/admin/users", token);
+    console.log("/admin/users response", res.body);
     // expect(res.body[0].isExpert).toBe(true);
-    expect(res.body).toBeDefined();
+    //expect(res.body).toBeDefined();
   });
 });
