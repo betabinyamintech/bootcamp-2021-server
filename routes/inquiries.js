@@ -1,62 +1,53 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
-const {models:{Inquiry}} = require('../models')
+const {
+  models: { Inquiry },
+} = require("../models");
 
-/* GET users listing. */
-router.get('/:inquiryId',async function(req, res, next) {
-  const {inquiryId} = req.params;
-  const inquiry = await Inquiry.findOne({_id:inquiryId})
+/* GET specific inquiry. */
+router.get("/:inquiryId", authenticateToken, async (req, res) => {
+  const { inquiryId } = req.params;
+  const inquiry = await Inquiry.findOne({ _id: inquiryId });
   console.log(inquiry);
   res.send(inquiry);
+});
 
+/* GET inquiries by user id. */
+router.get("/:userId", authenticateToken, async (req, res) => {
+  const { userId } = req.params;
+  const inquiries = await Inquiry.find({ userId }).exec();
+  const clientInquiries = inquiries.map(({ inquiryTitle, status, createdAT }) 
+    => { inquiryTitle, status, createdAT }) 
+  res.send(clientInquiries ?? {});
+});
+router.get("/user", authenticateToken, async (req, res) => {
+  const userId = req.user._id;
+  const inquiries = await Inquiry.find({ userId }).exec();
+  const clientInquiries = inquiries.map(({ inquiryTitle, status, createdAT }) 
+    => { inquiryTitle, status, createdAT }) 
+  res.send(clientInquiries ?? {});
+});
+
+/* GET all inquiries. */
+router.get("/", authenticateToken, async (req, res) => {
+  const inquiries = await Inquiry.find({}).exec();
+  res.send(inquiries ?? {});
 });
 
 //creat data
-router.post('/',async function(req, res, next) {
-  // const  {idUser,title,explanation,inquirySubjects,status}= req.body
-  const inquiry = await new Inquiry(req.body ).save();
-  console.log("POST! creat inquiry", inquiry);
+router.post("/", authenticateToken, async (req, res) => {
+  const inquiry = await new Inquiry(req.body).save();
+  console.log("POST! creat inquiry ", inquiry);
   res.send(inquiry);
 });
 
-//updata
-router.put('/:idInquiry',async function(req, res, next) {
-const {idInquiry} = req.params
-  const  {idUser,title,explanation,inquirySubjects,status}= req.body
-  await Inquiry.updateMany({ _id:idInquiry }, { idUser,title,explanation,inquirySubjects,status }).exec();
+//update
+router.put("/:inquiryId", authenticateToken, async (req, res) => {
+  const { inquiryId } = req.params;
+  // const { userId, title, explanation, inquirySubjects, status } = req.body;
+  await Inquiry.updateOne({ _id: inquiryId }, req.body, { omitUndefined: true }).exec();
 
-  res.send("OK!");
-
+  res.send("inquiry updated");
 });
 
-//delete data
-router.delete('/:idInquiry', async function(req, res, next) {
-  const  {idInquiry}= req.params
-  await Inquiry.deleteOne({ _id:idInquiry }).exec();
-
-  res.send("OK!");
-
-});
-// app.post("/inquiry", authenticateToken, async (req, res) => {
-//   const { idUser, title, explanation, inquiryTags, status } = req.body;
-//   const inquiry = await new Inquiry({
-//     idUser,
-//     title,
-//     explanation,
-//     inquiryTags,
-//     status,
-//   }).save();
-//   res.send(inquiry);
-// });
-
-// app.get("/inquiry", authenticateToken, async (req, res) => {
-//   const { _id } = req.body;
-//   const inquiry = await Inquiry.findOne({ _id }).exec();
-//   res.send(inquiry ?? {});
-// });
-// app.get("/inquiry", authenticateToken, async (req, res) => {
-//   const { idUser } = req.body;
-//   const inquiries = await Inquiry.find({ idUser }).exec();
-//   res.send(inquiries ?? {});
-// });
 module.exports = router;

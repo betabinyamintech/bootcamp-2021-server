@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 const inquirySchema = new mongoose.Schema(
   {
-    idUser: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
