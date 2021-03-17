@@ -1,16 +1,15 @@
-require("dotenv").config();
 const createError = require("http-errors");
 const express = require("express");
 const bcrypt = require("bcrypt");
 const { authenticateToken, generateAccessToken } = require("./jwt");
 const logger = require("morgan");
+
+require("dotenv").config();
+console.log('env', process.env)
+
 const {
-  connectDb,
   models: { User, Inquiry, Subject },
 } = require("./models");
-connectDb().then(() => {
-  console.log("connected to dataBase!");
-});
 const app = express();
 const { subjectRouter } = require("./routes");
 const salt = 10;
@@ -49,11 +48,11 @@ app.post("/register", async (req, res) => {
       return;
     }
 
-    const { _id } = await new User({
+    const user = await new User({
       email,
       password: hash,
     }).save();
-    const token = generateAccessToken({ _id });
+    const token = generateAccessToken(user);
     res.send({ token });
   } catch (err) {
     res.send(err.message);
@@ -74,14 +73,13 @@ app.post("/setProfile", authenticateToken, async (req, res) => {
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  const { _id } = await User.findOne({ email }).exec();
-  const token = generateAccessToken({ _id });
+  const user = await User.findOne({ email }).exec();
+  console.log('/login get user for email: ', email, user);
 
   const isValid = bcrypt.compareSync(password, user.password);
   if (!isValid) throw Error("user not valid");
-  const objectUser = user.toObject();
-  objectUser.token = token;
-  res.send(objectUser);
+  const token = generateAccessToken(user);
+  res.send({token});
 });
 
 app.post("/inquiry", authenticateToken, async (req, res) => {
@@ -111,18 +109,17 @@ app.get("/hi", authenticateToken, (req, res) => {
   res.send("hello awsome team number 1!");
 });
 
-if (process.env.TEST || true) {
+app.use("/subject", subjectRouter);
+if (process.env.NODE_ENV === 'test') {
   app.get("/deleteall", async (req, res) => {
     /// delete all data
     const response = await User.deleteMany();
-    console.log("response", response);
     res.send("ok");
   });
-}
-app.use("/subject", subjectRouter);
-if (!process.env.TEST)
+}else  {
   app.listen(process.env.PORT, () => {
     console.log("Opened port succesfully at port " + process.env.PORT);
   });
+}
 
 module.exports = app;

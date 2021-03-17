@@ -1,19 +1,12 @@
 const request = require("superagent");
-process.env.TEST = true;
-process.env.MONGO_USER_NAME_PASS = process.env.MONGO_TEST_SERVER
 const app = require("./app");
 const serverUrl = `http://localhost:${process.env.TESTPORT}`;
 
-beforeAll(async () => {
-  await app.listen(process.env.TESTPORT);
-  try {
+beforeAll( () => {
+  app.listen(process.env.TESTPORT, () => {
     console.log("Opened port succesfully at port " + process.env.TESTPORT);
-    const ok = await getRequest("/deleteall");
-    console.log(ok);
-  } catch (err) {
-    console.error(err);
-    debugger;
-  }
+    const ok = deleteAll();
+  });
 });
 
 const getRequest = (location) => request.get(serverUrl + location);
@@ -35,15 +28,23 @@ const deleteAll = async () => await getRequest("/deleteall");
 
 const mockUser = { email: "123", password: "b" };
 
-
-test("/register", async () => {
+describe('auth', () => {
   const unregisterdedUser = mockUser;
-  const res = await registerUser(unregisterdedUser);
-  const { token } = res.body;
-  expect(token).toBeDefined();
-});
+  var token
+  test("register", async () => {
+    const res = await registerUser(unregisterdedUser);
+    const { token } = res.body;
+    token = res.body.token;
+    expect(token).toBeDefined();
+  }) 
+  test("login", async () => {
+    const res = await loginUser(unregisterdedUser)
+    expect(token).toEqual(res.body.token)
+  });  
+})
 
 test("update profile", async () => {
   const user = await loginUser(mockUser);
   expect(user).toBeDefined();
 });
+  
