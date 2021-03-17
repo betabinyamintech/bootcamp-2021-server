@@ -18,11 +18,9 @@ router.get("/:inquiryId", authenticateToken, async (req, res) => {
 router.get("/user", authenticateToken, async (req, res) => {
   const userId = req.user._id;
   const inquiries = await Inquiry.find({ userId }).exec();
-  const clientInquiries = inquiries.map(
-    ({ inquiryTitle, status, createdAT }) => {
-      inquiryTitle, status, createdAT;
-    }
-  );
+  const clientInquiries = inquiries.map(({ inquiryTitle, status, createdAT }) => {
+    inquiryTitle, status, createdAT;
+  });
   res.send(clientInquiries ?? {});
 });
 

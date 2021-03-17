@@ -1,18 +1,25 @@
 const createError = require("http-errors");
 const express = require("express");
 const bcrypt = require("bcrypt");
+const cors = require("cors");
 const { authenticateToken, generateAccessToken } = require("./jwt");
 const logger = require("morgan");
 
 require("dotenv").config();
 
 const {
+  connectDb,
   models: { User },
 } = require("./models");
+
+connectDb().then(() => {
+  console.log("connected to dataBase!");
+});
 const app = express();
 const { usersRouter, tagsRouter, inquiriesRouter } = require("./routes");
 const salt = 10;
 
+app.use(cors());
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -70,6 +77,7 @@ app.post("/login", async (req, res) => {
 app.use("/users", usersRouter);
 app.use("/tags", tagsRouter);
 app.use("/inquiries", inquiriesRouter);
+app.use("/admin", require("./routes/admin"));
 
 // only test can delete all data and other tools for testing
 if (process.env.NODE_ENV === "test") {
