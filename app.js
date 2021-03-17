@@ -8,10 +8,11 @@ require("dotenv").config();
 console.log('env', process.env)
 
 const {
-  models: { User, Inquiry, Subject },
+  models: { User, Inquiry,  },
 } = require("./models");
 const app = express();
-const { subjectRouter } = require("./routes");
+const { tagRouter } = require("./routes");
+const { inquiriesRouter } = require("./routes");
 const salt = 10;
 
 app.use(logger("dev"));
@@ -83,12 +84,12 @@ app.post("/login", async (req, res) => {
 });
 
 app.post("/inquiry", authenticateToken, async (req, res) => {
-  const { idUser, title, explanation, inquirySubjects, status } = req.body;
+  const { idUser, title, explanation, inquiryTags, status } = req.body;
   const inquiry = await new Inquiry({
     idUser,
     title,
     explanation,
-    inquirySubjects,
+    inquiryTags,
     status,
   }).save();
   res.send(inquiry);
@@ -106,10 +107,13 @@ app.get("/inquiry", authenticateToken, async (req, res) => {
 });
 
 app.get("/hi", authenticateToken, (req, res) => {
-  res.send("hello awsome team number 1!");
+  const {_id}=req.user;
+  res.send("hello id: "+_id);
 });
 
 app.use("/subject", subjectRouter);
+
+// only test can delete all data and other tools for testing
 if (process.env.NODE_ENV === 'test') {
   app.get("/deleteall", async (req, res) => {
     /// delete all data
@@ -117,6 +121,7 @@ if (process.env.NODE_ENV === 'test') {
     res.send("ok");
   });
 }else  {
+  // if this is not a test run the server
   app.listen(process.env.PORT, () => {
     console.log("Opened port succesfully at port " + process.env.PORT);
   });

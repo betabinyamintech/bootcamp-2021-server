@@ -1,3 +1,4 @@
-const subjectRouter = require("./subjects");
+const tagRouter = require("./tag");
+const inquiriesRouter = require("./inquiries");
 
-module.exports = { subjectRouter };
+module.exports = { inquiriesRouter ,tagRouter};

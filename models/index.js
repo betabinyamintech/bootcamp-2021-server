@@ -1,9 +1,8 @@
 const mongoose = require("mongoose");
 
-
 const User = require("./user");
 const Inquiry = require("./inquiry");
-const Subject = require("./subject");
+const Tag = require("./tag");
 
 const connectDb = async () => {
   const mongoUrl =
@@ -20,6 +19,6 @@ connectDb().then(() => {
   console.log("connected to dataBase!");
 });
 
-const models = { User, Inquiry, Subject };
+const models = { User, Inquiry, Tag };
 
 module.exports = { connectDb, models };

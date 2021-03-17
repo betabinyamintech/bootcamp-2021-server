@@ -3,24 +3,52 @@ const mongoose = require("mongoose");
 
 const inquirySchema = new mongoose.Schema(
   {
-    idUser: { 
-      type: mongoose.Schema.Types.ObjectId, 
-      ref: "User", 
-      required: true
+    idUser: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
-    title: {
+    inquiryTitle: {
       type: String,
       required: true,
     },
-    explanation: {
+    inquiryContent: {
       type: String,
       required: true,
     },
-    inquirySubjects: { type: [String], required: true },
+    inquiryTags: [{ type: mongoose.Schema.Types.ObjectId, ref: "Tag" }],
 
     status: {
       type: String,
-      enum: ["sent", "matchesFound", "movedToExpert", "response"],
+      enum: [
+        "opened",
+        "missingDetails",
+        "matchesFound",
+        "movedToExpert",
+        "responseFromExpert",
+        "meetingScheduled",
+        "meetingWas",      
+        "irrelevant"
+      ],
+    },
+    irrelevantDetails: {
+      cause: { type: String, enum: ["admin", "user", "expert"] },
+      reason: String,
+    },
+    missingDetails: String,
+    expertsFound: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+    answersToExpertQuestions: [{ question: String, ans: String }],
+    meetingOptions: {
+      optionalDates: [Date],
+      lengthMeeting: Number,
+      preferredMeetingType: { type: String, enum: ["physically", "virtual"] },
+      meetingAddress: String,
+      scheduledDate:Date,
     },
   },
   { timestamps: true }

@@ -1,27 +1,29 @@
 var express = require('express');
 var router = express.Router();
+const {models:{Inquiry}} = require('../models')
 
 /* GET users listing. */
-router.get('/:inquiryId', function(req, res, next) {
-  const  {inquiryId}= req.params;
-  res.send(inquiryId);
+router.get('/:inquiryId',async function(req, res, next) {
+  const {inquiryId} = req.params;
+  const inquiry = await Inquiry.findOne({_id:inquiryId})
+  console.log(inquiry);
+  res.send(inquiry);
 
 });
 
 //creat data
-router.post('/', function(req, res, next) {
-  const  {idUser,title,explanation,inquirySubjects,status}= req.body
-  const Inquiry = await new Inquiry({ title, completed: false }).save();
-  console.log("POST! creat inquiry", Inquiry);
-  res.send(Inquiry);
+router.post('/',async function(req, res, next) {
+  // const  {idUser,title,explanation,inquirySubjects,status}= req.body
+  const inquiry = await new Inquiry(req.body ).save();
+  console.log("POST! creat inquiry", inquiry);
+  res.send(inquiry);
 });
 
 //updata
-router.put('/:idInquiry', function(req, res, next) {
-
+router.put('/:idInquiry',async function(req, res, next) {
+const {idInquiry} = req.params
   const  {idUser,title,explanation,inquirySubjects,status}= req.body
-
-  await Inquiry.updateOne({ idUser }, { idUser,title,explanation,inquirySubjects,status }).exec();
+  await Inquiry.updateMany({ _id:idInquiry }, { idUser,title,explanation,inquirySubjects,status }).exec();
 
   res.send("OK!");
 
@@ -29,8 +31,8 @@ router.put('/:idInquiry', function(req, res, next) {
 
 //delete data
 router.delete('/:idInquiry', async function(req, res, next) {
-  const  {idUser}= req.params
-  await Product.deleteOne({ idUser }).exec();
+  const  {idInquiry}= req.params
+  await Inquiry.deleteOne({ _id:idInquiry }).exec();
 
   res.send("OK!");
 
