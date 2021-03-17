@@ -5,13 +5,13 @@ const { authenticateToken, generateAccessToken } = require("./jwt");
 const logger = require("morgan");
 
 require("dotenv").config();
-console.log('env', process.env)
+console.log("env", process.env);
 
 const {
-  models: { User, Inquiry,  },
+  models: { User, Inquiry },
 } = require("./models");
 const app = express();
-const { usersRouter,tagsRouter,inquiriesRouter } = require("./routes");
+const { usersRouter, tagsRouter, inquiriesRouter } = require("./routes");
 const salt = 10;
 
 app.use(logger("dev"));
@@ -27,17 +27,26 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render("error");
 });
+function validateEmail(email) {
+  const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  return re.test(String(email).toLowerCase());
+}
 
 app.post("/register", async (req, res) => {
   try {
     const { email, password } = req.body;
-    const hash = bcrypt.hashSync(password, salt);
-    const existing = await User.findOne({ email }).exec();
-    if (existing) {
-      res.sendStatus(403);
+    if (!validateEmail) {
+      res.status(403).send("invalid email");
       return;
     }
 
+    const existing = await User.findOne({ email }).exec();
+    if (existing) {
+      res.status(403).send("email already existing");
+      return;
+    }
+    
+    const hash = bcrypt.hashSync(password, salt);
     const user = await new User({
       email,
       password: hash,
@@ -49,34 +58,15 @@ app.post("/register", async (req, res) => {
   }
 });
 
-app.post("/setProfile", authenticateToken, async (req, res) => {
-  try {
-    const user = await new User(req.body).save();
-    console.log(user);
-    const objectUser = user.toObject();
-    objectUser.token = token;
-    res.send(objectUser);
-  } catch (err) {
-    res.send(err.message);
-  }
-});
-
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email }).exec();
-  console.log('/login get user for email: ', email, user);
+  console.log("/login get user for email: ", email, user);
 
   const isValid = bcrypt.compareSync(password, user.password);
   if (!isValid) throw Error("user not valid");
   const token = generateAccessToken(user);
-  res.send({token});
-});
-
-
-
-app.get("/hi", authenticateToken, (req, res) => {
-  const {_id}=req.user;
-  res.send("hello id: "+_id);
+  res.send({ token });
 });
 
 app.use("/users", usersRouter);
@@ -84,13 +74,13 @@ app.use("/tags", tagsRouter);
 app.use("/inquiries", inquiriesRouter);
 
 // only test can delete all data and other tools for testing
-if (process.env.NODE_ENV === 'test') {
+if (process.env.NODE_ENV === "test") {
   app.get("/deleteall", async (req, res) => {
     /// delete all data
     const response = await User.deleteMany();
     res.send("ok");
   });
-}else  {
+} else {
   // if this is not a test run the server
   app.listen(process.env.PORT, () => {
     console.log("Opened port succesfully at port " + process.env.PORT);
