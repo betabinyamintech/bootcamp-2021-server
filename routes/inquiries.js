@@ -18,16 +18,22 @@ router.get("/:inquiryId", authenticateToken, async (req, res) => {
   res.send(inquiry);
 });
 
+//update
+router.put("/:inquiryId", authenticateToken, async (req, res) => {
+  const { inquiryId } = req.params;
+  // const { userId, title, explanation, inquirySubjects, status } = req.body;
+  const inquiry=await Inquiry.updateOne({ _id: inquiryId }, req.body, {
+    omitUndefined: true,
+  }).exec();
+
+  res.send(inquiry);
+});
 /* GET inquiries by user id. */
 router.get("/user", authenticateToken, async (req, res) => {
   const userId = req.user._id;
-  const inquiries = await Inquiry.find({ userId }).exec();
-  const clientInquiries = inquiries.map(
-    ({ inquiryTitle, status, createdAT }) => {
-      inquiryTitle, status, createdAT;
-    }
-  );
-  res.send(clientInquiries ?? {});
+  const inquiries = await Inquiry.find({ userId },{_id,inquiryTitle:1, status:1, createdAT:1}).exec();
+
+  res.send(inquiries ?? {});
 });
 
 /* GET all inquiries. */
@@ -40,15 +46,5 @@ router.post("/new", authenticateToken, async (req, res) => {
   res.send(inquiry);
 });
 
-//update
-router.put("/:inquiryId", authenticateToken, async (req, res) => {
-  const { inquiryId } = req.params;
-  // const { userId, title, explanation, inquirySubjects, status } = req.body;
-  await Inquiry.updateOne({ _id: inquiryId }, req.body, {
-    omitUndefined: true,
-  }).exec();
-
-  res.send("inquiry updated");
-});
 
 module.exports = router;
