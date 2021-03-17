@@ -18,7 +18,7 @@ const loginUser = async ({ email, password }) =>
 
 const deleteAll = async () => await getRequest("/deleteall");
 
-const mockUser = { email: "me@there.now", password: "asdasdas" };
+const mockUser = { email: "d@there.now", password: "asdasdas" };
 
 describe("auth", () => {
   const unregisterdedUser = mockUser;
@@ -33,6 +33,6 @@ describe("auth", () => {
   });
   test("login", async () => {
     const res = await loginUser(unregisterdedUser);
-    expect(my_token).toEqual(res.body.token);
+    expect(res.body.token).toBeDefined();
   });
 });

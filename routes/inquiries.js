@@ -1,6 +1,4 @@
 var express = require("express");
-const { authenticateToken } = require("../jwt");
-
 var router = express.Router();
 const { authenticateToken } = require("../jwt");
 const {
