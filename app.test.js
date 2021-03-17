@@ -24,12 +24,15 @@ const deleteAll = async () => await getRequest("/deleteall");
 
 const mockUser = { email: "reut@there.now", password: "asdasdas" };
 
+beforeAll(async () => {
+  await deleteAll();
+});
+
 describe("auth", () => {
   const unregisterdedUser = mockUser;
   let my_token;
   test("register", async () => {
     const res = await registerUser(unregisterdedUser);
-    console.log("res.body", res.body);
     const { token } = res.body;
 
     my_token = token;
@@ -40,13 +43,15 @@ describe("auth", () => {
     expect(res.body.token).toBeDefined();
   });
   test("update user", async () => {
-    const res = await putRequestWithToken("/users/",my_token).send({firstName:"reut",isExpert:true});
+    const res = await putRequestWithToken("/users/", my_token).send({
+      firstName: "reut",
+      isExpert: true,
+    });
     expect(res.body).toBeDefined();
   });
-  test("get experts",async()=>{
-    const res=await getRequestWithToken("/users/experts",my_token);
+  test("get experts", async () => {
+    const res = await getRequestWithToken("/users/experts", my_token);
     console.log(res.body);
-    expect(res.body).toBeDefined();
-
-  })
+    expect(res.body[0].isExpert).toBe(true);
+  });
 });
