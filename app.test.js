@@ -4,11 +4,15 @@ const app = require("./app");
 const getRequest = (location) => request(app).get(location);
 const postRequest = (location) =>
   request(app).post(location).set("Accept", "application/json");
+const putRequest = (location) =>
+  request(app).put(location).set("Accept", "application/json");
 
 const getRequestWithToken = (location, token) =>
   getRequest(location).set({ Authorization: `Bearer ${token}` });
 const postRequestWithToken = (location, token) =>
   postRequest(location).set({ Authorization: `Bearer ${token}` });
+const putRequestWithToken = (location, token) =>
+  putRequest(location).set({ Authorization: `Bearer ${token}` });
 
 const registerUser = async ({ email, password }) =>
   await postRequest("/register").send({ email, password });
@@ -18,7 +22,7 @@ const loginUser = async ({ email, password }) =>
 
 const deleteAll = async () => await getRequest("/deleteall");
 
-const mockUser = { email: "d@there.now", password: "asdasdas" };
+const mockUser = { email: "reut@there.now", password: "asdasdas" };
 
 describe("auth", () => {
   const unregisterdedUser = mockUser;
@@ -35,4 +39,14 @@ describe("auth", () => {
     const res = await loginUser(unregisterdedUser);
     expect(res.body.token).toBeDefined();
   });
+  test("update user", async () => {
+    const res = await putRequestWithToken("/users/",my_token).send({firstName:"reut",isExpert:true});
+    expect(res.body).toBeDefined();
+  });
+  test("get experts",async()=>{
+    const res=await getRequestWithToken("/users/experts",my_token);
+    console.log(res.body);
+    expect(res.body).toBeDefined();
+
+  })
 });
