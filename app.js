@@ -5,7 +5,6 @@ const { authenticateToken, generateAccessToken } = require("./jwt");
 const logger = require("morgan");
 
 require("dotenv").config();
-console.log("env", process.env);
 
 const {
   models: { User },
