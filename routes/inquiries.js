@@ -24,10 +24,6 @@ router.get("/user", authenticateToken, async (req, res) => {
 });
 
 /* GET all inquiries. */
-router.get("/", authenticateToken, async (req, res) => {
-  const inquiries = await Inquiry.find({}).exec();
-  res.send(inquiries ?? {});
-});
 
 //creat data
 router.post("/", authenticateToken, async (req, res) => {
