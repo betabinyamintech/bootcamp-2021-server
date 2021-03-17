@@ -1,4 +1,6 @@
 var express = require("express");
+const { authenticateToken } = require("../jwt");
+
 var router = express.Router();
 const {
   models: { Inquiry },
@@ -16,15 +18,13 @@ router.get("/:inquiryId", authenticateToken, async (req, res) => {
 router.get("/:userId", authenticateToken, async (req, res) => {
   const { userId } = req.params;
   const inquiries = await Inquiry.find({ userId }).exec();
-  const clientInquiries = inquiries.map(({ inquiryTitle, status, createdAT }) 
-    => { inquiryTitle, status, createdAT }) 
+  const clientInquiries = inquiries.map(({ inquiryTitle, status, createdAT })=>{return {inquiryTitle, status, createdAT};}) 
   res.send(clientInquiries ?? {});
 });
 router.get("/user", authenticateToken, async (req, res) => {
   const userId = req.user._id;
   const inquiries = await Inquiry.find({ userId }).exec();
-  const clientInquiries = inquiries.map(({ inquiryTitle, status, createdAT }) 
-    => { inquiryTitle, status, createdAT }) 
+  const clientInquiries = inquiries.map(({ inquiryTitle, status, createdAT }) =>({ inquiryTitle, status, createdAT }) );
   res.send(clientInquiries ?? {});
 });
 
