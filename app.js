@@ -32,29 +32,25 @@ function validateEmail(email) {
 }
 
 app.post("/register", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    if (!validateEmail(email)) {
-      res.status(403).send("invalid email").end();
-      return;
-    }
-
-    const existing = await User.findOne({ email }).exec();
-    if (existing) {
-      res.status(403).send("email already existing").end();
-      return;
-    }
-
-    const hash = bcrypt.hashSync(password, salt);
-    const user = await new User({
-      email,
-      password: hash,
-    }).save();
-    const token = generateAccessToken(user);
-    res.send({ token });
-  } catch (err) {
-    res.send(err.message);
+  const { email, password } = req.body;
+  if (!validateEmail(email)) {
+    res.status(403).send("invalid email").end();
+    return;
   }
+
+  const existing = await User.findOne({ email }).exec();
+  if (existing) {
+    res.status(403).send("email already existing").end();
+    return;
+  }
+
+  const hash = bcrypt.hashSync(password, salt);
+  const user = await new User({
+    email,
+    password: hash,
+  }).save();
+  const token = generateAccessToken(user);
+  res.send({ token });
 });
 
 app.post("/login", async (req, res) => {
@@ -81,11 +77,6 @@ if (process.env.NODE_ENV === "test") {
     /// delete all data
     const response = await User.deleteMany();
     res.send("ok");
-  });
-} else {
-  // if this is not a test run the server
-  app.listen(process.env.PORT, () => {
-    console.log("Opened port succesfully at port " + process.env.PORT);
   });
 }
 
