@@ -2,23 +2,16 @@ const request = require("supertest");
 const app = require("./app");
 
 const getRequest = (location) => request(app).get(location);
-const postRequest = (location) =>
-  request(app).post(location).set("Accept", "application/json");
-const putRequest = (location) =>
-  request(app).put(location).set("Accept", "application/json");
+const postRequest = (location) => request(app).post(location).set("Accept", "application/json");
+const putRequest = (location) => request(app).put(location).set("Accept", "application/json");
 
-const getRequestWithToken = (location, token) =>
-  getRequest(location).set({ Authorization: `Bearer ${token}` });
-const postRequestWithToken = (location, token) =>
-  postRequest(location).set({ Authorization: `Bearer ${token}` });
-const putRequestWithToken = (location, token) =>
-  putRequest(location).set({ Authorization: `Bearer ${token}` });
+const getRequestWithToken = (location, token) => getRequest(location).set({ Authorization: `Bearer ${token}` });
+const postRequestWithToken = (location, token) => postRequest(location).set({ Authorization: `Bearer ${token}` });
+const putRequestWithToken = (location, token) => putRequest(location).set({ Authorization: `Bearer ${token}` });
 
-const registerUser = async ({ email, password }) =>
-  await postRequest("/register").send({ email, password });
+const registerUser = async ({ email, password }) => await postRequest("/register").send({ email, password });
 
-const loginUser = async ({ email, password }) =>
-  await postRequest("/login").send({ email, password });
+const loginUser = async ({ email, password }) => await postRequest("/login").send({ email, password });
 
 const deleteAll = async () => await getRequest("/deleteall");
 
@@ -53,5 +46,11 @@ describe("auth", () => {
     const res = await getRequestWithToken("/users/experts", my_token);
     console.log(res.body);
     expect(res.body[0].isExpert).toBe(true);
+  });
+  test("get user", async () => {
+    const res = await getRequestWithToken("/users/:userId", my_token);
+    console.log(res.body);
+    // expect(res.body[0].isExpert).toBe(true);
+    expect(res.body).toBeDefined();
   });
 });
