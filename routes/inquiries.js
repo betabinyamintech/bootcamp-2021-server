@@ -8,13 +8,11 @@ const updateStatusIfMeetingPassed = async (inquiry) => {
   const today = new Date();
 
   if (inquiry.status === "meetingScheduled" && today > inquiry.meetingOptions.scheduledDate) {
-    console.log("inquiry", inquiry);
     const newInquiry = await Inquiry.findOneAndUpdate(
       { _id: inquiry._id },
       { status: "meetingDatePassed" },
       { new: true }
     ).exec();
-    console.log("new inquiry", newInquiry);
     return newInquiry;
   }
   return inquiry;
@@ -37,32 +35,32 @@ router.get("/user", authenticateToken, async (req, res) => {
 router.get("/:inquiryId", authenticateToken, async (req, res) => {
   const { inquiryId } = req.params;
 
-  const inquiry = await Inquiry.findOne({ _id: inquiryId })
+  let inquiry = await Inquiry.findOne({ _id: inquiryId })
     .populate("userId")
     .populate("expertsFound")
     .populate("movedToExpert.expertId")
     .exec();
-  console.log(inquiry);
+  inquiry = await updateStatusIfMeetingPassed(inquiry);
   res.send(inquiry);
 });
 
 //update
 router.put("/:inquiryId", authenticateToken, async (req, res) => {
   const { inquiryId } = req.params;
-  // const { userId, title, explanation, inquirySubjects, status } = req.body;
-  const inquiry = await Inquiry.updateOne({ _id: inquiryId }, req.body, {
+  let inquiry = await Inquiry.findOneAndUpdate({ _id: inquiryId }, req.body, {
     omitUndefined: true,
     runValidators: true,
+    new: true,
   }).exec();
-
+  inquiry = await updateStatusIfMeetingPassed(inquiry);
   res.send(inquiry);
 });
 
 //creat new inquiry
 router.post("/new", authenticateToken, async (req, res) => {
   const userId = req.user._id;
-  const inquiry = await new Inquiry({ userId, ...req.body }).save();
-  console.log("POST! creat inquiry ", inquiry);
+  let inquiry = await new Inquiry({ userId, ...req.body }).save();
+  inquiry = await updateStatusIfMeetingPassed(inquiry);
   res.send(inquiry);
 });
 

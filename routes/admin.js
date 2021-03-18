@@ -30,23 +30,35 @@ router.get("/experts", async (req, res) => {
   ).exec();
   experts = experts.filter(
     ({ firstName, lastName, expertDetails: { inquiryTags } }) =>
-      (!name || firstName.includes(name) || lastName.includes(name)) &&
-      (!tag || inquiryTags.includes(tag))
+      (!name || firstName.includes(name) || lastName.includes(name)) && (!tag || inquiryTags.includes(tag))
   );
   res.send(experts ?? {});
 });
+const updateStatusIfMeetingPassed = async (inquiry) => {
+  const today = new Date();
 
+  if (inquiry.status === "meetingScheduled" && today > inquiry.meetingOptions.scheduledDate) {
+    const newInquiry = await Inquiry.findOneAndUpdate(
+      { _id: inquiry._id },
+      { status: "meetingDatePassed" },
+      { new: true }
+    ).exec();
+    return newInquiry;
+  }
+  return inquiry;
+};
 router.get("/inquiries", async (req, res) => {
   let inquiries = await Inquiry.find(req.query).populate("userId").exec();
-  inquiries = inquiries.map(
-    ({
-      inquiryTitle,
-      status,
-      userId: { firstName, lastName },
-      meetingOptions: { scheduledDate, meetingAddress, lengthMeeting },
-      createdAt,
-      updatedAt,
-    }) => {
+  inquiries = await Promise.all(
+    inquiries.map(async (inquiry) => {
+      const {
+        inquiryTitle,
+        status,
+        userId: { firstName, lastName },
+        meetingOptions: { scheduledDate, meetingAddress, lengthMeeting },
+        createdAt,
+        updatedAt,
+      } = await updateStatusIfMeetingPassed(inquiry);
       return {
         inquiryTitle,
         status,
@@ -55,8 +67,9 @@ router.get("/inquiries", async (req, res) => {
         createdAt,
         updatedAt,
       };
-    }
+    })
   );
+
   res.send(inquiries ?? {});
 });
 
