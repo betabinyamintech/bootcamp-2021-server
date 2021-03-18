@@ -5,13 +5,17 @@ const {
   models: { Inquiry },
 } = require("../models");
 const updateStatusIfMeetingPassed = async (inquiry) => {
-  if (
-    inquiry.status === "meetingScheduled" &&
-    new Date() > inquiry.meetingOptions.scheduledDate
-  ) {
-    return await inquiry
-      .findOneAndUpdate({ _id: inquiry._id }, { status: "meetingDatePassed" })
-      .exec();
+  const today = new Date();
+
+  if (inquiry.status === "meetingScheduled" && today > inquiry.meetingOptions.scheduledDate) {
+    console.log("inquiry", inquiry);
+    const newInquiry = await Inquiry.findOneAndUpdate(
+      { _id: inquiry._id },
+      { status: "meetingDatePassed" },
+      { new: true }
+    ).exec();
+    console.log("new inquiry", newInquiry);
+    return newInquiry;
   }
   return inquiry;
 };
@@ -19,11 +23,13 @@ const updateStatusIfMeetingPassed = async (inquiry) => {
 /* GET inquiries by user id. */
 router.get("/user", authenticateToken, async (req, res) => {
   const userId = req.user._id;
-  const inquiries = await Inquiry.find(
-    { userId },
-    { _id: 1, inquiryTitle: 1, status: 1, createdAt: 1 }
-  ).exec();
-  inquiries.map((inquiry) => updateStatusIfMeetingPassed(inquiry._id));
+  let inquiries = await Inquiry.find({ userId }).exec();
+  inquiries = await Promise.all(
+    inquiries.map(async (inquiry) => {
+      const { _id, inquiryTitle, status, createdAt } = await updateStatusIfMeetingPassed(inquiry);
+      return { _id, inquiryTitle, status, createdAt };
+    })
+  );
   res.send(inquiries ?? {});
 });
 
