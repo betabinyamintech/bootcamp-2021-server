@@ -3,14 +3,15 @@ const { authenticateToken } = require("../jwt");
 var router = express.Router();
 
 const {
-  models: { User },
+  models: { User, Inquiry },
 } = require("../models");
 
-router.use((req, res, next) => {
+router.use(authenticateToken, (req, res, next) => {
   if (!req.user.isAdmin) {
     res.sendStatus(403);
     return;
   }
+  next();
 });
 
 router.get("/experts", authenticateToken, async (req, res) => {

@@ -17,6 +17,7 @@ router.put("/me", authenticateToken, async (req, res) => {
   // console.log(req.user);
   const updatedUser = await User.updateOne({ _id }, req.body, {
     omitUndefined: true,
+    runValidators: true,
   }).exec();
 
   res.send(updatedUser);
