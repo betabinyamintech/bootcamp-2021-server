@@ -22,10 +22,9 @@ router.get("/experts", authenticateToken, async (req, res) => {
       _id: 1,
       firstName: 1,
       lastName: 1,
-      helpKind: 1,
       city: 1,
       profession: 1,
-      inquiryTags: 1,
+      expertDetails:{helpKind: 1,inquiryTags: 1},
     }
   )
     .exec()
