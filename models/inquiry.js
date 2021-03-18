@@ -52,7 +52,7 @@ const inquirySchema = new mongoose.Schema(
     meetingOptions: {
       optionalDates: [Date],
       lengthMeeting: Number,
-      preferredMeetingType: { type: String, enum: ["physically", "virtual"] },
+      meetingType: { type: String, enum: ["physically", "phoneCall", "virtual"] },
       meetingAddress: String,
       scheduledDate: Date,
     },

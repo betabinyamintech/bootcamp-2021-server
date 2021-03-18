@@ -15,7 +15,7 @@ router.use((req, res, next) => {
 
 router.get("/experts", authenticateToken, async (req, res) => {
   const { name, tag } = req.query;
-  
+
   const experts = await User.find(
     { isExpert: true },
     {
@@ -24,14 +24,13 @@ router.get("/experts", authenticateToken, async (req, res) => {
       lastName: 1,
       city: 1,
       profession: 1,
-      expertDetails:{helpKind: 1,inquiryTags: 1},
+      expertDetails: { aboutMe: 1, inquiryTags: 1 },
     }
   )
     .exec()
     .filter(
       ({ firstName, lastName, inquiryTags }) =>
-        (!name||firstName.includes(name) || lastName.includes(name)) &&
-        (!tag||inquiryTags.includes(tag))
+        (!name || firstName.includes(name) || lastName.includes(name)) && (!tag || inquiryTags.includes(tag))
     );
   res.send(experts ?? {});
 });

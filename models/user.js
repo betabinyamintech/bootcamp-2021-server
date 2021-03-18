@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    profileFullFields: String,
+    profileFullFields: Boolean,
     imageSrc: String,
     firstName: String,
     lastName: String,
@@ -23,11 +23,12 @@ const userSchema = new mongoose.Schema(
 
     expertDetails: {
       isVerified: Boolean,
-      helpKind: String,
+      aboutMe: String,
+      helpDescription: String,
       inquiryTags: [String],
       questionsBeforeMeeting: [String],
       lengthMeeting: Number,
-      preferredMeetingType: { type: String, enum: ["physically", "virtual"] },
+      preferredMeetingType: { type: String, enum: ["physically", "phoneCall", "virtual"] },
       meetingAddress: String,
     },
   },
