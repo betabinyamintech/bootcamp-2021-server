@@ -8,9 +8,9 @@ function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
   if (token == null) return res.sendStatus(401); // if there isn't any token
-  jwt.verify(token, process.env.TOKEN_SECRET, async (err, { _id }) => {
+  jwt.verify(token, process.env.TOKEN_SECRET, async (err,user) => {
     if (err) return res.status(403).send("invalid token");
-    req.user = await User.findOne({ _id }).exec();
+    req.user = await User.findOne({_id:user._id}).exec();
     next(); // pass the execution off to whatever request the client intended
   });
 }

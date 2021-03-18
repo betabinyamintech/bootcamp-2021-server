@@ -62,7 +62,6 @@ app.post("/register", async (req, res) => {
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  console.log(req.body);
   const user = await User.findOne({ email }).exec();
   if (!user) {
     res.status(403).send("user not exist");
@@ -73,9 +72,10 @@ app.post("/login", async (req, res) => {
     res.status(403).send("invalid password");
     return;
   }
-
   const token = generateAccessToken(user);
-  res.send({ user, token });
+  const userObject = user.toObject();
+  const { password: removed, ...resUser } = userObject;
+  res.send({ resUser, token });
 });
 
 app.use("/users", usersRouter);
