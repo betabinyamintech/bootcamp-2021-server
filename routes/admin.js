@@ -37,14 +37,32 @@ router.get("/experts", async (req, res) => {
 });
 
 router.get("/inquiries", async (req, res) => {
-  const inquiries = await Inquiry.find(req.query).exec();
+  let inquiries = await Inquiry.find(req.query).populate("userId").exec();
+  inquiries = inquiries.map(
+    ({
+      inquiryTitle,
+      status,
+      userId: { firstName, lastName },
+      meetingOptions: { scheduledDate, meetingAddress, lengthMeeting },
+      createdAt,
+      updatedAt,
+    }) => {
+      return {
+        inquiryTitle,
+        status,
+        userId: { firstName, lastName },
+        meetingOptions: { scheduledDate, meetingAddress, lengthMeeting },
+        createdAt,
+        updatedAt,
+      };
+    }
+  );
   res.send(inquiries ?? {});
 });
 
 router.get("/user/:userId", async (req, res) => {
   const { userId } = req.params;
   const user = await User.findOne({ _id: userId });
-  console.log(user);
   res.send(user);
 });
 
