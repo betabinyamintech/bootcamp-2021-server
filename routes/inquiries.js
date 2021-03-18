@@ -4,12 +4,25 @@ const { authenticateToken } = require("../jwt");
 const {
   models: { Inquiry },
 } = require("../models");
+const updateStatusIfMeetingPassed =async (inquiryId) => {
+  return await Inquiry.findOneAndUpdate(
+    {
+      _id: inquiryId,
+      status: "meetingScheduled",
+      meetingOptions: { scheduledDate: { $lt: new Date() } },
+    },
+    { status: "meetingDatePassed" }
+  ).exec();
+};
 
 /* GET inquiries by user id. */
 router.get("/user", authenticateToken, async (req, res) => {
   const userId = req.user._id;
-  const inquiries = await Inquiry.find({ userId }, { _id: 1, inquiryTitle: 1, status: 1, createdAt: 1 }).exec();
-
+  const inquiries = await Inquiry.find(
+    { userId },
+    { _id: 1, inquiryTitle: 1, status: 1, createdAt: 1 }
+  ).exec();
+inquiries.map((inquiry)=>updateStatusIfMeetingPassed(inquiry._id));
   res.send(inquiries ?? {});
 });
 

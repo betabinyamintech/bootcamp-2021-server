@@ -27,7 +27,7 @@ const inquirySchema = new mongoose.Schema(
         "movedToExpert",
         "responseFromExpert",
         "meetingScheduled",
-        "meetingWas",
+        "meetingDatePassed",
         "irrelevant",
       ],
     },
