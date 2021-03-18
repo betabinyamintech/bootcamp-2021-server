@@ -11,7 +11,6 @@ function authenticateToken(req, res, next) {
   jwt.verify(token, process.env.TOKEN_SECRET, async (err, { _id }) => {
     if (err) return res.status(403).send("invalid token");
     req.user = await User.findOne({ _id }).exec();
-    console.log(req.user);
     next(); // pass the execution off to whatever request the client intended
   });
 }

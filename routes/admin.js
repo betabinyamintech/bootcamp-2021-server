@@ -14,10 +14,10 @@ router.use(authenticateToken, (req, res, next) => {
   next();
 });
 
-router.get("/experts", authenticateToken, async (req, res) => {
+router.get("/experts", async (req, res) => {
   const { name, tag } = req.query;
-
-  const experts = await User.find(
+  console.log("req experts:", req.user);
+  let experts = await User.find(
     { isExpert: true },
     {
       _id: 1,
@@ -27,21 +27,21 @@ router.get("/experts", authenticateToken, async (req, res) => {
       profession: 1,
       expertDetails: { aboutMe: 1, inquiryTags: 1 },
     }
-  )
-    .exec()
-    .filter(
-      ({ firstName, lastName, inquiryTags }) =>
-        (!name || firstName.includes(name) || lastName.includes(name)) && (!tag || inquiryTags.includes(tag))
-    );
+  ).exec();
+  experts = experts.filter(
+    ({ firstName, lastName, expertDetails: { inquiryTags } }) =>
+      (!name || firstName.includes(name) || lastName.includes(name)) &&
+      (!tag || inquiryTags.includes(tag))
+  );
   res.send(experts ?? {});
 });
 
-router.get("/inquiries", authenticateToken, async (req, res) => {
+router.get("/inquiries", async (req, res) => {
   const inquiries = await Inquiry.find(req.query).exec();
   res.send(inquiries ?? {});
 });
 
-router.get("/user/:userId", authenticateToken, async (req, res) => {
+router.get("/user/:userId", async (req, res) => {
   const { userId } = req.params;
   const user = await User.findOne({ _id: userId });
   console.log(user);
