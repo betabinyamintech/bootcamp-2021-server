@@ -4,15 +4,16 @@ const { authenticateToken } = require("../jwt");
 const {
   models: { Inquiry },
 } = require("../models");
-const updateStatusIfMeetingPassed =async (inquiryId) => {
-  return await Inquiry.findOneAndUpdate(
-    {
-      _id: inquiryId,
-      status: "meetingScheduled",
-      meetingOptions: { scheduledDate: { $lt: new Date() } },
-    },
-    { status: "meetingDatePassed" }
-  ).exec();
+const updateStatusIfMeetingPassed = async (inquiry) => {
+  if (
+    inquiry.status === "meetingScheduled" &&
+    new Date() > inquiry.meetingOptions.scheduledDate
+  ) {
+    return await inquiry
+      .findOneAndUpdate({ _id: inquiry._id }, { status: "meetingDatePassed" })
+      .exec();
+  }
+  return inquiry;
 };
 
 /* GET inquiries by user id. */
@@ -22,7 +23,7 @@ router.get("/user", authenticateToken, async (req, res) => {
     { userId },
     { _id: 1, inquiryTitle: 1, status: 1, createdAt: 1 }
   ).exec();
-inquiries.map((inquiry)=>updateStatusIfMeetingPassed(inquiry._id));
+  inquiries.map((inquiry) => updateStatusIfMeetingPassed(inquiry._id));
   res.send(inquiries ?? {});
 });
 
