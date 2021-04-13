@@ -4,6 +4,7 @@ const { authenticateToken } = require("../jwt");
 const {
   models: { Inquiry },
 } = require("../models");
+
 const updatedStatus = async (inquiry) => {
   const today = new Date();
 
@@ -43,13 +44,17 @@ router.get("/:inquiryId", authenticateToken, async (req, res) => {
     .populate("expertsFound")
     .populate("movedToExpert.expertId")
     .exec();
-    const objectInquiry = {
-      status: updatedStatus(inquiry),
-      ...inquiry.toObject(),
-    };
-    
-    delete objectInquiry.userId.password;
-    console.log(objectInquiry);
+  const objectInquiry = {
+    status: updatedStatus(inquiry),
+    ...inquiry.toObject(),
+  };
+
+  delete objectInquiry.userId.password;
+  for(let i=0;i<objectInquiry.expertsFound.length;i++){
+    delete objectInquiry.expertsFound[i].password;
+  }
+  objectInquiry.movedToExpert.expertId&&delete objectInquiry.movedToExpert.expertId.password;
+  
   res.send(objectInquiry);
 });
 
@@ -76,7 +81,7 @@ router.post("/new", authenticateToken, async (req, res) => {
     status: updatedStatus(inquiry),
     ...inquiry.toObject(),
   };
-    res.send(objectInquiry);
+  res.send(objectInquiry);
 });
 
 module.exports = router;

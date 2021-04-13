@@ -16,7 +16,7 @@ const inquirySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    inquiryTags: [String],
+    inquiryTags: { type: [String], required: true },
 
     status: {
       type: String,
@@ -30,6 +30,7 @@ const inquirySchema = new mongoose.Schema(
         "meetingDatePassed",
         "irrelevant",
       ],
+      required: true,
     },
     irrelevantDetails: {
       cause: { type: String, enum: ["admin", "user", "expert"] },
@@ -52,7 +53,10 @@ const inquirySchema = new mongoose.Schema(
     meetingOptions: {
       optionalDates: [Date],
       lengthMeeting: Number,
-      meetingType: { type: String, enum: ["physically", "phoneCall", "virtual"] },
+      meetingType: {
+        type: String,
+        enum: ["physically", "phoneCall", "virtual"],
+      },
       meetingAddress: String,
       scheduledDate: Date,
     },

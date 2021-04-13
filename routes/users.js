@@ -9,7 +9,10 @@ const {
 /* GET all experts. */
 
 router.get("/me", authenticateToken, async (req, res) => {
-  const { password, ...resUser } = req.user.toObject();
+  
+  // const { password, ...resUser } = req.user.toObject();
+  resUser = req.user.toObject();
+  delete resUser.password;
   res.send(resUser);
 });
 
@@ -20,7 +23,11 @@ router.put("/me", authenticateToken, async (req, res) => {
     runValidators: true,
     new:true
   }).exec();
-  const { password, ...resUser } = updatedUser.toObject();
+  // const { password, ...resUser } = updatedUser.toObject();
+  resUser = updatedUser.toObject();
+
+  delete resUser.password;
+
   res.send(resUser);
 });
 module.exports = router;
