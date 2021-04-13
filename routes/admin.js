@@ -16,7 +16,6 @@ router.use(authenticateToken, (req, res, next) => {
 
 router.get("/experts", async (req, res) => {
   const { name, tag } = req.query;
-  console.log("req experts:", req.user);
   let experts = await User.find(
     { isExpert: true },
     {
@@ -42,7 +41,7 @@ const updateStatusIfMeetingPassed = async (inquiry) => {
       { _id: inquiry._id },
       { status: "meetingDatePassed" },
       { new: true }
-    ).exec();
+    ).populate("userId").exec();
     return newInquiry;
   }
   return inquiry;
@@ -76,7 +75,9 @@ router.get("/inquiries", async (req, res) => {
 router.get("/user/:userId", async (req, res) => {
   const { userId } = req.params;
   const user = await User.findOne({ _id: userId });
-  res.send(user);
+  const resUser=user.toObject();
+  delete resUser.password;
+  res.send(resUser);
 });
 
 module.exports = router;

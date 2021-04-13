@@ -2,8 +2,21 @@ var express = require("express");
 var router = express.Router();
 const { authenticateToken } = require("../jwt");
 const {
-  models: { Inquiry },
+  models: { Inquiry, Tag },
 } = require("../models");
+
+const validateTags = async (myTags) => {
+  if (!myTags) return true;
+  let tagsList = await Tag.find({}).exec();
+  tagsList = tagsList.map(({ name }) => name);
+  for (let i = 0; i < myTags.length; i++) {
+    if (tagsList.indexOf(myTags[i]) === -1) {
+      return false;
+    }
+  }
+  return true;
+};
+
 const updatedStatus = async (inquiry) => {
   const today = new Date();
 
@@ -43,18 +56,29 @@ router.get("/:inquiryId", authenticateToken, async (req, res) => {
     .populate("expertsFound")
     .populate("movedToExpert.expertId")
     .exec();
-    const objectInquiry = {
-      status: updatedStatus(inquiry),
-      ...inquiry.toObject(),
-    };
-    
-    delete objectInquiry.userId.password;
-    console.log(objectInquiry);
+  const objectInquiry = {
+    status: updatedStatus(inquiry),
+    ...inquiry.toObject(),
+  };
+
+  delete objectInquiry.userId.password;
+  for (let i = 0; i < objectInquiry.expertsFound.length; i++) {
+    delete objectInquiry.expertsFound[i].password;
+  }
+  objectInquiry.movedToExpert.expertId &&
+    delete objectInquiry.movedToExpert.expertId.password;
+
   res.send(objectInquiry);
 });
 
 //update
 router.put("/:inquiryId", authenticateToken, async (req, res) => {
+  const isValidateTags = await validateTags(req.body.inquiryTags);
+  if (!isValidateTags) {
+    res.status(403).send("invalid tag");
+    return;
+  }
+
   const { inquiryId } = req.params;
   let inquiry = await Inquiry.findOneAndUpdate({ _id: inquiryId }, req.body, {
     omitUndefined: true,
@@ -69,14 +93,21 @@ router.put("/:inquiryId", authenticateToken, async (req, res) => {
 });
 
 //creat new inquiry
+
 router.post("/new", authenticateToken, async (req, res) => {
+  const isValidateTags = await validateTags(req.body.inquiryTags);
+  if (!isValidateTags) {
+    res.status(403).send("invalid tag");
+    return;
+  }
+
   const userId = req.user._id;
   let inquiry = await new Inquiry({ userId, ...req.body }).save();
   const objectInquiry = {
     status: updatedStatus(inquiry),
     ...inquiry.toObject(),
   };
-    res.send(objectInquiry);
+  res.send(objectInquiry);
 });
 
 module.exports = router;
