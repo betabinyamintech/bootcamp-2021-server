@@ -14,13 +14,15 @@ router.get("/me", authenticateToken, async (req, res) => {
 });
 
 router.put("/me", authenticateToken, async (req, res) => {
+  console.log("/me ", req.body);
   const { _id } = req.user;
   const updatedUser = await User.findOneAndUpdate({ _id }, req.body, {
     omitUndefined: true,
     runValidators: true,
-    new:true
+    new: true,
   }).exec();
   const { password, ...resUser } = updatedUser.toObject();
+  console.log("resUser", resUser);
   res.send(resUser);
 });
 module.exports = router;
