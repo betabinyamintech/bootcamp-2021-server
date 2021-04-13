@@ -9,16 +9,18 @@ const {
 /* GET all experts. */
 
 router.get("/me", authenticateToken, async (req, res) => {
-  res.send(req.user);
+  const { password, ...resUser } = req.user.toObject();
+  res.send(resUser);
 });
 
 router.put("/me", authenticateToken, async (req, res) => {
   const { _id } = req.user;
-  const updatedUser = await User.updateOne({ _id }, req.body, {
+  const updatedUser = await User.findOneAndUpdate({ _id }, req.body, {
     omitUndefined: true,
     runValidators: true,
+    new:true
   }).exec();
-
-  res.send(updatedUser);
+  const { password, ...resUser } = updatedUser.toObject();
+  res.send(resUser);
 });
 module.exports = router;
