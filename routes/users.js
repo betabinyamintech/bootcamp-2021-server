@@ -16,6 +16,7 @@ router.get("/me", authenticateToken, async (req, res) => {
 });
 
 router.put("/me", authenticateToken, async (req, res) => {
+  console.log("/me ", req.body);
   if (req.body.expertDetails) {
     const myTags = req.body.expertDetails.inquiryTags;
     let tagsList = await Tag.find({}).exec();
@@ -33,6 +34,8 @@ router.put("/me", authenticateToken, async (req, res) => {
     runValidators: true,
     new: true,
   }).exec();
+  const { password, ...resUser } = updatedUser.toObject();
+  console.log("resUser", resUser);
   // const { password, ...resUser } = updatedUser.toObject();
   resUser = updatedUser.toObject();
 
