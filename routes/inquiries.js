@@ -20,15 +20,8 @@ const validateTags = async (myTags) => {
 const updatedStatus = async (inquiry) => {
   const today = new Date();
 
-  if (
-    inquiry.status === "meetingScheduled" &&
-    today > inquiry.meetingOptions.scheduledDate
-  ) {
-    await Inquiry.findOneAndUpdate(
-      { _id: inquiry._id },
-      { status: "meetingDatePassed" },
-      { new: true }
-    ).exec();
+  if (inquiry.status === "meetingScheduled" && today > inquiry.meetingOptions.scheduledDate) {
+    await Inquiry.findOneAndUpdate({ _id: inquiry._id }, { status: "meetingDatePassed" }, { new: true }).exec();
     return "meetingDatePassed";
   }
   return inquiry.status;
@@ -38,12 +31,16 @@ const updatedStatus = async (inquiry) => {
 router.get("/user", authenticateToken, async (req, res) => {
   const userId = req.user._id;
   let inquiries = await Inquiry.find({ userId }).exec();
+  let expertInquiries = await Inquiry.find({ movedToExpert: { expertId: userId } }).exec();
+  inquiries = inquiries.concat(expertInquiries);
   inquiries = await Promise.all(
     inquiries.map(async (inquiry) => ({
       status: updatedStatus(inquiry),
       ...inquiry.toObject(),
     }))
   );
+  console.log(inquiries);
+
   res.send(inquiries ?? {});
 });
 
@@ -65,8 +62,7 @@ router.get("/:inquiryId", authenticateToken, async (req, res) => {
   for (let i = 0; i < objectInquiry.expertsFound.length; i++) {
     delete objectInquiry.expertsFound[i].password;
   }
-  objectInquiry.movedToExpert.expertId &&
-    delete objectInquiry.movedToExpert.expertId.password;
+  objectInquiry.movedToExpert.expertId && delete objectInquiry.movedToExpert.expertId.password;
 
   res.send(objectInquiry);
 });
