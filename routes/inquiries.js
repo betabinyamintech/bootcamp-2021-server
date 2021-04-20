@@ -204,6 +204,10 @@ router.post("/new", authenticateToken, async (req, res) => {
     res.status(403).send("invalid tag");
     return;
   }
+  if (req.body.status&&req.body.status!="opened") {
+    res.status(403).send("The status must be opened");
+    return;
+  }
 
   const userId = req.user._id;
   let inquiry = await new Inquiry({
