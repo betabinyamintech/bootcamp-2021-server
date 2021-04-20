@@ -6,7 +6,8 @@ const {
 } = require("../models");
 
 router.get("/", authenticateToken, async (req, res) => {
-  const tagsList = await Tag.find({}).exec();
+  let tagsList = await Tag.find({}).exec();
+  tagsList = tagsList.map(({ name }) => name);
   res.send(tagsList);
 });
 
