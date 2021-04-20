@@ -16,6 +16,29 @@ const validateTags = async (myTags) => {
   }
   return true;
 };
+const checkChangeStatusField = (inquiry) => {
+  const status = inquiry.status;
+  switch (status) {
+    case "opened":
+      return true;
+    case "missingDetails":
+      return inquiry.missingDetails ? true : false;
+    case "matchesFound":
+      return inquiry.expertsFound.length != 0 ? true : false;
+    case "movedToExpert":
+      return inquiry.movedToExpert.expertId ? true : false;
+    case "responseFromExpert":
+      return inquiry.meetingOptions ? true : false;
+    case "meetingScheduled":
+      return inquiry.meetingOptions.scheduledDate ? true : false;
+    case "meetingDatePassed":
+      return true;
+    case "irrelevant":
+      return inquiry.irrelevantDetails ? true : false;
+    default:
+      return false;
+  }
+};
 
 const updatedStatus = async (inquiry) => {
   const today = new Date();
@@ -31,6 +54,7 @@ const updatedStatus = async (inquiry) => {
     ).exec();
     return "meetingDatePassed";
   }
+  
   return inquiry.status;
 };
 
@@ -78,15 +102,102 @@ router.put("/:inquiryId", authenticateToken, async (req, res) => {
     res.status(403).send("invalid tag");
     return;
   }
-
   const { inquiryId } = req.params;
+  const oldInquiry = await Inquiry.findOne({ _id: inquiryId }).exec();
+  const newStatus = req.body.status;
+  console.log(newStatus,oldInquiry.status);
+  if (newStatus) {
+    switch (oldInquiry.status) {
+      case "opened":
+        if (
+          newStatus === "missingDetails" ||
+          newStatus === "irrelevant" ||
+          newStatus === "matchesFound"
+        ) {
+          const isValidStatus = checkChangeStatusField(req.body);
+          if (!isValidStatus) {
+            res.status(403).send("Please fill all the relevant fields");
+            return;
+          }
+        } else {
+          res.status(403).send("invalid status");
+          return;
+        }
+        break;
+      case "matchesFound":
+        if (newStatus === "irrelevant" || newStatus === "movedToExpert") {
+          const isValidStatus = checkChangeStatusField(req.body);
+          if (!isValidStatus) {
+            res.status(403).send("Please fill all the relevant fields");
+            return;
+          }
+        } else {
+          res.status(403).send("invalid status");
+          return;
+        }
+        break;
+      case "movedToExpert":
+        if (newStatus === "irrelevant" || newStatus === "responseFromExpert") {
+          const isValidStatus = checkChangeStatusField(req.body);
+          if (!isValidStatus) {
+            res.status(403).send("Please fill all the relevant fields");
+            return;
+          }
+        } else {
+          res.status(403).send("invalid status");
+          return;
+        }
+        break;
+      case "responseFromExpert":
+        if (newStatus === "irrelevant" || newStatus === "meetingScheduled") {
+          const isValidStatus = checkChangeStatusField(req.body);
+          if (!isValidStatus) {
+            res.status(403).send("Please fill all the relevant fields");
+            return;
+          }
+        } else {
+          res.status(403).send("invalid status");
+          return;
+        }
+        break;
+      case "meetingScheduled":
+        if (newStatus === "irrelevant" || newStatus === "meetingDatePassed") {
+          const isValidStatus = checkChangeStatusField(req.body);
+          if (!isValidStatus) {
+            res.status(403).send("Please fill all the relevant fields");
+            return;
+          }
+        } else {
+          res.status(403).send("invalid status");
+          return;
+        }
+        break;
+      case "meetingDatePassed":
+        res.status(403).send("This inquiry cannot be changed anymore");
+        return;
+      case "missingDetails":
+        res.status(403).send("This status changes automatically");
+        return;
+      case "irrelevant":
+        res.status(403).send("This inquiry cannot be changed anymore");
+        return;
+      default:
+    }
+  }
+
   let inquiry = await Inquiry.findOneAndUpdate({ _id: inquiryId }, req.body, {
     omitUndefined: true,
     runValidators: true,
     new: true,
   }).exec();
+
+  let autoUpdatedStatus=updatedStatus(inquiry);
+  if(oldInquiry.status==="missingDetails")
+  {
+    autoUpdatedStatus= "opened";
+  }
   const objectInquiry = {
-    status: updatedStatus(inquiry),
+    status: autoUpdatedStatus,
     ...inquiry.toObject(),
   };
   res.send(objectInquiry);
@@ -102,9 +213,13 @@ router.post("/new", authenticateToken, async (req, res) => {
   }
 
   const userId = req.user._id;
-  let inquiry = await new Inquiry({ userId, ...req.body }).save();
+  let inquiry = await new Inquiry({
+    userId,
+    status: "opened",
+    ...req.body,
+  }).save();
   const objectInquiry = {
-    status: updatedStatus(inquiry),
+    status: "updatedStatus(inquiry)",
     ...inquiry.toObject(),
   };
   res.send(objectInquiry);

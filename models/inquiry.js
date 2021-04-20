@@ -44,7 +44,7 @@ const inquirySchema = new mongoose.Schema(
       },
     ],
     movedToExpert: {
-      expertId: {
+      expertId: { 
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
       },
