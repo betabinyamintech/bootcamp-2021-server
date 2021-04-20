@@ -42,12 +42,10 @@ const checkChangeStatusField = (inquiry) => {
 
 const updatedStatus = async (inquiry) => {
   const today = new Date();
-
   if (inquiry.status === "meetingScheduled" && today > inquiry.meetingOptions.scheduledDate) {
-    await Inquiry.findOneAndUpdate({ _id: inquiry._id }, { status: "meetingDatePassed" }, { new: true }).exec();
+    await Inquiry.updateOne({ _id: inquiry._id }, { status: "meetingDatePassed" }).exec();
     return "meetingDatePassed";
   }
-  
   return inquiry.status;
 };
 
@@ -78,7 +76,7 @@ router.get("/:inquiryId", authenticateToken, async (req, res) => {
     .populate("movedToExpert.expertId")
     .exec();
   const objectInquiry = {
-    status: updatedStatus(inquiry),
+    status: await updatedStatus(inquiry),
     ...inquiry.toObject(),
   };
 
@@ -101,7 +99,6 @@ router.put("/:inquiryId", authenticateToken, async (req, res) => {
   const { inquiryId } = req.params;
   const oldInquiry = await Inquiry.findOne({ _id: inquiryId }).exec();
   const newStatus = req.body.status;
-  console.log(newStatus,oldInquiry.status);
   if (newStatus) {
     switch (oldInquiry.status) {
       case "opened":
@@ -211,8 +208,8 @@ router.post("/new", authenticateToken, async (req, res) => {
   const userId = req.user._id;
   let inquiry = await new Inquiry({
     userId,
-    status: "opened",
     ...req.body,
+    status: "opened",
   }).save();
   const objectInquiry = {
     status: "updatedStatus(inquiry)",
