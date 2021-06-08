@@ -1,13 +1,10 @@
 var express = require("express");
 const { authenticateToken } = require("../jwt");
 var router = express.Router();
-
 const {
   models: { User, Tag },
 } = require("../models");
-
 /* GET all experts. */
-
 router.get("/me", authenticateToken, async (req, res) => {
   // const { password, ...resUser } = req.user.toObject();
   resUser = req.user.toObject();
@@ -16,7 +13,7 @@ router.get("/me", authenticateToken, async (req, res) => {
 });
 
 router.put("/me", authenticateToken, async (req, res) => {
-  console.log("/me ", req.body);
+  console.log("/me", req.body);
   if (req.body.expertDetails) {
     const myTags = req.body.expertDetails.inquiryTags;
     let tagsList = await Tag.find({}).exec();
@@ -34,11 +31,10 @@ router.put("/me", authenticateToken, async (req, res) => {
     runValidators: true,
     new: true,
   }).exec();
-  const { password, ...resUser } = updatedUser.toObject();
-  console.log("resUser", resUser);
+  let { password, ...resUser } = updatedUser.toObject();
+  // console.log("resUser", resUser);
   // const { password, ...resUser } = updatedUser.toObject();
   resUser = updatedUser.toObject();
-
   delete resUser.password;
 
   res.send(resUser);

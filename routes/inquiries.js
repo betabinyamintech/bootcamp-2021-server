@@ -42,8 +42,14 @@ const checkChangeStatusField = (inquiry) => {
 
 const updatedStatus = async (inquiry) => {
   const today = new Date();
-  if (inquiry.status === "meetingScheduled" && today > inquiry.meetingOptions.scheduledDate) {
-    await Inquiry.updateOne({ _id: inquiry._id }, { status: "meetingDatePassed" }).exec();
+  if (
+    inquiry.status === "meetingScheduled" &&
+    today > inquiry.meetingOptions.scheduledDate
+  ) {
+    await Inquiry.updateOne(
+      { _id: inquiry._id },
+      { status: "meetingDatePassed" }
+    ).exec();
     return "meetingDatePassed";
   }
   return inquiry.status;
@@ -51,9 +57,12 @@ const updatedStatus = async (inquiry) => {
 
 /* GET inquiries by user id. */
 router.get("/user", authenticateToken, async (req, res) => {
+  console.log("req.body" + req.body);
   const userId = req.user._id;
   let inquiries = await Inquiry.find({ userId }).exec();
-  let expertInquiries = await Inquiry.find({ movedToExpert: { expertId: userId } }).exec();
+  let expertInquiries = await Inquiry.find({
+    movedToExpert: { expertId: userId },
+  }).exec();
   inquiries = inquiries.concat(expertInquiries);
   inquiries = await Promise.all(
     inquiries.map(async (inquiry) => ({
@@ -69,7 +78,6 @@ router.get("/user", authenticateToken, async (req, res) => {
 /* GET specific inquiry. */
 router.get("/:inquiryId", authenticateToken, async (req, res) => {
   const { inquiryId } = req.params;
-
   const inquiry = await Inquiry.findOne({ _id: inquiryId })
     .populate("userId")
     .populate("expertsFound")
@@ -84,7 +92,8 @@ router.get("/:inquiryId", authenticateToken, async (req, res) => {
   for (let i = 0; i < objectInquiry.expertsFound.length; i++) {
     delete objectInquiry.expertsFound[i].password;
   }
-  objectInquiry.movedToExpert.expertId && delete objectInquiry.movedToExpert.expertId.password;
+  objectInquiry.movedToExpert.expertId &&
+    delete objectInquiry.movedToExpert.expertId.password;
 
   res.send(objectInquiry);
 });
@@ -184,10 +193,9 @@ router.put("/:inquiryId", authenticateToken, async (req, res) => {
     new: true,
   }).exec();
 
-  let autoUpdatedStatus=updatedStatus(inquiry);
-  if(oldInquiry.status==="missingDetails")
-  {
-    autoUpdatedStatus= "opened";
+  let autoUpdatedStatus = updatedStatus(inquiry);
+  if (oldInquiry.status === "missingDetails") {
+    autoUpdatedStatus = "opened";
   }
   const objectInquiry = {
     status: autoUpdatedStatus,
@@ -204,12 +212,12 @@ router.post("/new", authenticateToken, async (req, res) => {
     res.status(403).send("invalid tag");
     return;
   }
-  if (req.body.status&&req.body.status!="opened") {
+  if (req.body.status && req.body.status != "opened") {
     res.status(403).send("The status must be opened");
     return;
   }
-
   const userId = req.user._id;
+  console.log("request" + req.body);
   let inquiry = await new Inquiry({
     userId,
     ...req.body,
