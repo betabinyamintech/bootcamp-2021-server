@@ -74,6 +74,14 @@ router.get("/user", authenticateToken, async (req, res) => {
 
   res.send(inquiries ?? {});
 });
+// DELETE specific Inquiry
+router.delete("/:inquiryId", authenticateToken, async (req, res) => {
+  const { inquiryId } = req.params;
+  console.log(inquiryId);
+  const inquiry = await Inquiry.deleteOne({ _id: inquiryId });
+  console.log("inquiry deleted");
+  res.send(inquiryId + " " + " inquiry deleted");
+});
 
 /* GET specific inquiry. */
 router.get("/:inquiryId", authenticateToken, async (req, res) => {
