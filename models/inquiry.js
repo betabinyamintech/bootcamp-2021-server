@@ -29,6 +29,8 @@ const inquirySchema = new mongoose.Schema(
         "meetingScheduled",
         "meetingDatePassed",
         "irrelevant",
+        "canceledByUser",
+        "refusedByExpert",
       ],
       required: true,
     },
@@ -37,6 +39,14 @@ const inquirySchema = new mongoose.Schema(
       reason: String,
     },
     missingDetails: String,
+    cancelReason: String,
+    cancelDate: Date,
+    refusedBy: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
     expertsFound: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -44,7 +54,7 @@ const inquirySchema = new mongoose.Schema(
       },
     ],
     movedToExpert: {
-      expertId: { 
+      expertId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
       },

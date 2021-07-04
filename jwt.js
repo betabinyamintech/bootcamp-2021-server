@@ -4,7 +4,6 @@ const {
 } = require("./models");
 
 function authenticateToken(req, res, next) {
-  console.log("by authenticate", req.body);
   // Gather the jwt access token from the request header
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];

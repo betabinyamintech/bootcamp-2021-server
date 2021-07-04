@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-
+mongoose.set("useNewUrlParser", true);
+mongoose.set("useCreateIndex", true);
 const User = require("./user");
 const Inquiry = require("./inquiry");
 const Tag = require("./tag");
@@ -14,6 +15,5 @@ const connectDb = async () => {
     useUnifiedTopology: true,
   });
 };
-
 const models = { User, Inquiry, Tag };
 module.exports = { connectDb, models };

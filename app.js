@@ -4,9 +4,9 @@ const bcrypt = require("bcrypt");
 const cors = require("cors");
 const { authenticateToken, generateAccessToken } = require("./jwt");
 const logger = require("morgan");
+const debug = require("debug")("server.js");
 
 require("dotenv").config();
-
 const {
   connectDb,
   models: { User },
@@ -16,6 +16,7 @@ connectDb().then(() => {
   console.log("connected to dataBase!");
 });
 const app = express();
+app.set("view engine", "jade");
 const { usersRouter, tagsRouter, inquiriesRouter } = require("./routes");
 const salt = 10;
 
@@ -31,10 +32,12 @@ app.use(function (err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render("error");
+  // res.render("error");
+  res.json({ error: err });
 });
 function validateEmail(email) {
-  const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+  const re =
+    /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return re.test(String(email).toLowerCase());
 }
 

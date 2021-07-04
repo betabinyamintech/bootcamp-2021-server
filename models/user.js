@@ -28,7 +28,10 @@ const userSchema = new mongoose.Schema(
       inquiryTags: [String],
       questionsBeforeMeeting: [String],
       lengthMeeting: Number,
-      preferredMeetingType: { type: String, enum: ["physically", "phoneCall", "virtual"] },
+      preferredMeetingType: {
+        type: String,
+        enum: ["physically", "phoneCall", "virtual"],
+      },
       meetingAddress: String,
     },
   },
