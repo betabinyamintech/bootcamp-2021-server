@@ -61,7 +61,7 @@ const updatedStatus = async (inquiry) => {
 };
 /* GET inquiries by user id. */
 router.get("/user", authenticateToken, async (req, res) => {
-  // console.log("req.body" + req.body);
+  console.log("start get");
   const userId = req.user._id;
   let inquiries = await Inquiry.find({ userId })
     .populate("expertsFound")

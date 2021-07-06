@@ -7,6 +7,10 @@ const tagSchema = new mongoose.Schema({
     unique: true,
   },
   createdAt: Date,
+  createdBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
 });
 const Tag = mongoose.model("Tag", tagSchema);
 
