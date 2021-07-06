@@ -4,15 +4,12 @@ const {
 } = require("./models");
 
 function authenticateToken(req, res, next) {
-  console.log(" autheticate row 7");
   // Gather the jwt access token from the request header
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
   if (token == null) return res.sendStatus(401); // if there isn't any token
   jwt.verify(token, process.env.TOKEN_SECRET, async (err, user) => {
-    console.log(" autheticate row 13");
     if (err) return res.status(403).send("invalid token");
-    console.log(" autheticate row 14");
 
     req.user = await User.findOne({ _id: user._id }).exec();
     next(); // pass the execution off to whatever request the client intended
