@@ -94,10 +94,12 @@ router.get("/inquiries", async (req, res) => {
 
 router.get("/users", async (req, res) => {
   // const isExpert = true;
-  const experts = await User.find({ isExpert: true }).exec();
-  // let response = await users.json();
-  // const resUser = user.toObject();
-  // delete resUser.password;
+  let searchOptions = {
+    "expertDetails.expertProfileCompleted": true,
+    isExpert: true,
+  };
+  const experts = await User.find(searchOptions).exec();
+
   console.log("experts", experts);
   res.send(experts);
 });

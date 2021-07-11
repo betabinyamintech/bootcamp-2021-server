@@ -28,11 +28,14 @@ const userSchema = new mongoose.Schema(
       inquiryTags: [String],
       questionsBeforeMeeting: [String],
       lengthMeeting: Number,
+      peoplesKind: String,
+      link: String,
       preferredMeetingType: {
         type: String,
         enum: ["physically", "phoneCall", "virtual"],
       },
       meetingAddress: String,
+      expertProfileCompleted: Boolean,
     },
   },
   { timestamps: true }
